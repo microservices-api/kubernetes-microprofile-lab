@@ -1,0 +1,130 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{  .Chart.Name }}-deployment"
+  labels:
+    chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  template:
+    metadata:
+      labels:
+        app: "{{  .Chart.Name }}-selector"
+        version: "current"
+      annotations:
+        prometheus.io.scrape: "true"
+        prometheus.io/port: "9080"
+    spec:
+      containers:
+      - name: "{{  .Chart.Name  }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{ if .Values.istio.enabled }}
+{{ else }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+          initialDelaySeconds: 120
+          periodSeconds: 15
+{{  end }}
+        resources:
+          requests:
+            cpu: "{{ .Values.image.resources.requests.cpu }}"
+            memory: "{{ .Values.image.resources.requests.memory }}"
+        env:
+          - name: PORT
+            value: "{{ .Values.service.servicePort }}"
+          - name: APPLICATION_NAME
+            value: "{{ .Release.Name }}"
+          - name: APM_BM_GATEWAY_URL
+            valueFrom:
+              secretKeyRef:
+                name: apm-server-config
+                key: apm_bm_gateway_url
+                optional: true
+          - name: APM_KEYFILE
+            valueFrom:
+              secretKeyRef:
+                name: apm-server-config
+                key: apm_keyfile
+                optional: true
+          - name: APM_KEYFILE_PSWD
+            valueFrom:
+              secretKeyRef:
+                name: apm-server-config
+                key: apm_keyfile_pswd
+                optional: true
+          - name: IBAM_INGRESS_URL
+            valueFrom:
+              secretKeyRef:
+                name: apm-server-config
+                key: ibam_ingress_url
+                optional: true
+          - name: IBAM_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: apm-server-config
+                key: ibam_token
+                optional: true
+          - name: isAppDown
+            valueFrom:
+              configMapKeyRef:
+                name: vappdown
+                key: vappdown
+{{ if ne .Values.test true }}
+          - name: dbUsername
+            valueFrom:
+              secretKeyRef:
+                name: cloudant-secret
+                key: dbUsername
+          - name: dbPassword
+            valueFrom:
+              secretKeyRef:
+                name: cloudant-secret
+                key: dbPassword
+          - name: dbUrl
+            value: "http://{{ .Chart.Name | trunc 46 | trimSuffix "-" }}-ibm-cloudant-dev"
+          - name: USERNAME
+            value: admin
+          - name: PASSWORD
+            value: password
+          - name: MB_KEYSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mb-keystore-password
+                key: password
+          - name: MB_TRUSTSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mb-truststore-password
+                key: password
+        volumeMounts:
+        - name: keystore
+          mountPath: /etc/wlp/config/keystore
+        - name: truststore
+          mountPath: /etc/wlp/config/truststore
+        - name: liberty-config
+          mountPath: /config/configDropins
+      volumes:
+       - name: keystore
+         secret:
+           secretName: mb-keystore
+       - name: truststore
+         secret:
+           secretName: mb-truststore
+       - name: liberty-config
+         configMap:
+           name: liberty-logging-config
+           items:
+             - key: keystore.xml
+               path: defaults/keystore.xml
+             - key: logging.xml
+               path: defaults/logging.xml
+           optional: true
+{{ end }}

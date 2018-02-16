@@ -1,0 +1,24 @@
+{{ if .Values.ingress.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "{{  .Chart.Name }}-ingress"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"  
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/rewrite-target: {{ .Values.ingress.rewriteTarget }}
+   
+spec:
+  rules:
+  - host: 
+    http:
+      paths:
+      - path: {{ .Values.ingress.path }}
+        backend:
+          serviceName: "{{  .Chart.Name }}-service"
+          servicePort: {{ .Values.service.servicePort }}
+{{ end }}

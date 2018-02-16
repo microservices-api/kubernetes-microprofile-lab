@@ -1,0 +1,104 @@
+{{ if .Values.base.enabled }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{  .Chart.Name }}-basedeployment"
+  labels:
+    chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+spec:
+  replicas: {{ .Values.base.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  template:
+    metadata:
+      labels:
+        app: "{{  .Chart.Name }}-selector"
+        version: "base"
+      annotations:
+        prometheus.io.scrape: "true"
+        prometheus.io/port: "9080"
+    spec:
+      containers:
+      - name: "{{  .Chart.Name  }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.base.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{ if .Values.istio.enabled }}
+{{ else }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+          initialDelaySeconds: 120
+          periodSeconds: 15
+{{  end }}
+        resources:
+          requests:
+            cpu: "{{ .Values.image.resources.requests.cpu }}"
+            memory: "{{ .Values.image.resources.requests.memory }}"
+        env:
+          - name: PORT
+            value: "{{ .Values.service.servicePort }}"
+          - name: isAppDown
+            valueFrom:
+              configMapKeyRef:
+                name: vappdown
+                key: vappdown
+{{ if ne .Values.test true }}
+          - name: dbUsername
+            valueFrom:
+              secretKeyRef:
+                name: cloudant-secret
+                key: dbUsername
+          - name: dbPassword
+            valueFrom:
+              secretKeyRef:
+                name: cloudant-secret
+                key: dbPassword
+          - name: dbHost
+            value: $CLOUDANT_SERVICE_SERVICE_HOST
+          - name: dbPort
+            value: $CLOUDANT_SERVICE_SERVICE_PORT
+          - name: USERNAME
+            value: admin
+          - name: PASSWORD
+            value: password
+          - name: MB_KEYSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mb-keystore-password
+                key: password
+          - name: MB_TRUSTSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mb-truststore-password
+                key: password
+        command: ["/bin/sh","-c"]
+        args: ["if [ ! -z $dbPassword ]; then export dbUrl=http://$CLOUDANT_SERVICE_SERVICE_HOST:$CLOUDANT_SERVICE_SERVICE_PORT; exec /opt/ibm/wlp/bin/server run defaultServer; fi;"]
+        volumeMounts:
+        - name: keystore
+          mountPath: /etc/wlp/config/keystore
+        - name: truststore
+          mountPath: /etc/wlp/config/truststore
+        - name: liberty-config
+          mountPath: /config/configDropins
+      volumes:
+       - name: keystore
+         secret:
+           secretName: mb-keystore
+       - name: truststore
+         secret:
+           secretName: mb-truststore
+       - name: liberty-config
+         configMap:
+           name: liberty-logging-config
+           items:
+             - key: keystore.xml
+               path: defaults/keystore.xml
+             - key: logging.xml
+               path: defaults/logging.xml
+           optional: true
+{{ end }}
+{{ end }}
