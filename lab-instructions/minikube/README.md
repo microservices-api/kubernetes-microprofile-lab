@@ -1,54 +1,25 @@
+# Deploying the sample directly to a local minikube installation
 
-## Overview
+This is the simplest way for a developer to get the sample up and running locally.
 
-The initial goal of ICP Event Management is to provide basic manageability though existing IBM offerings for ICp and customer workloads in the October 2017 ICp release, so that customers can start to integrate ICp into their existing processes.  In this case, Event Management integration seeks to surface ICp platform, monitoring and logging events in Netcool Operations Insights (NOI), also known as Omnibus.
+## Before you begin
 
-The effort is part of an overall strategy to support and then integrate DevOps and Service Management with ICp, as illustrated in the following diagram.
+* Install a Git client to obtain the sample code.
+* Install [Maven](https://maven.apache.org/download.cgi) and a Java 8 JDK.
+* Install a [Docker](https://docs.docker.com/engine/installation/) engine.
 
-![image](images/Samples/DevOpsSvcMgmtToolintegration.png)
+## Install the Microservice Builder Sample application
 
+1. Install minikube and the Microservice Builder fabric as described in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html).
+1. Install the [Microservice Builder ELK Sample](https://github.com/WASdev/sample.microservicebuilder.helm.elk) - Elasticsearch, Logstash, and Kibana stack used for monitoring metrics.
+1. Enable ingress with the command `minikube addons enable ingress`.
+1. `git clone` the following project [sample.microservicebuilder.vote](https://github.com/WASdev/sample.microservicebuilder.vote).
+1. Run `mvn clean package` sample.microservicebuilder.vote
+1. If you have not done so already, ensure that your Docker CLI is targeting the minikube Docker engine with `minikube docker-env`.
+1. `docker build -t microservice-vote .`
+1. Deploy the microservice from its root directory with the following helm install command `helm install --name=vote chart/microservice-vote`.
+1. Use `kubectl get ing` to determine the address of the `web-application-ingress`. Open this location in a web browser to access the sample. 
 
-The main persona being addressed, is outlined below
+## Modifying the sample
 
-![image](images/Samples/PersonaUseCases.png)
-
-
-## System Context
-
-![image](images/Samples/NetcoolContext.png)
-
-* (a) Kubernetes events are surfaced in NOI
-* (b) The Prometheus alertmanager can be configured to send events to NOI
-* (c) APM and/or DevOps monitoring can send alerts as events to NOI
-* (d) The logstash forwarder for ELK can be configured to also forward loge records to NOI
-
-## Use Cases
-
-An as an Operations Engineer, I have visibility into whether my ICp system is experiencing degradation or failures in my event console for example :* ICp base events, e.g.:	* Failures from Logging (ELK), Monitoring (Prometheus/heapster), Docker	* Deployment failures, Pod failures from Kubernetes	* Storage (GlusterFS, NFS, object storage) failures* Basic container (stdout, stderr) messages * Threshold events from basic ICp monitoring	* E.g. AlertManager events form Prometheus* Existing Monitoring tools that are monitoring ICp/Workloads, e.g. APM, New Relic, Dynatrace, etc.* Events and data from systems and infrastructure outside of ICp; but that ICp/ICp workloads depend on.***Optional for October:***
-* I can more effectively manage my dynamic environment by putting current resource and relationship context around otherwise isolated event and topology data via real-time topology views, searches and event correlation and enrichment.  (ICp and related topology)* I can expedite forensics and post-mortem activities related to incidents by using historical topology and event/status views to understand my topology at a given time and to compare between two times. * I can execute [semi-]automated runbooks to resolve common problems in ICp
-
-## System Flows
-
-See System Context, above
-
-
-## Customer Requirements
-
-See "Requirements" and "Use Cases" above as a starting point.  Additional specific requirements will be added here as they are gathered.
-
-
-## Reviewer Notes
-
-Initial reviewer include (but are limited to) the following:
-
-* Ajay Apte
-* Mike Kaczmarski
-* Gerd Breiter
-* Robin Hernandez
-
-
-## External Reviewers
-
-## References
-
-Issues that are being worked in the context of this Feature Spec are lined form the following epic:
+Once you've made changes to the source code you'll want to rebuild and redeploy the new modules. See [this topic](updating_the_app.md) for some notes about redeployment. You can also explore adding [security](adding_security.md) to the application with OpenID Connect and JSON Web Tokens (JWT).
