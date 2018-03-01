@@ -1,2 +1,2 @@
-# kubernetes-microprofile-lab
-This lab illustrates steps to deploy a MicroProfile application in a Kubernetes environment
+# Kubernetes MicroProfile Lab
+This lab illustrates steps to deploy a MicroProfile application in a Kubernetes environment, which you can choose between [Minikube](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/minikube) or [IBM Cloud Private](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/ibm-cloud-private).
