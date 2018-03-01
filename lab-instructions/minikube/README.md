@@ -14,7 +14,7 @@ This is the simplest way for a developer to get the sample up and running locall
 1. Enable ingress with the command `minikube addons enable ingress`
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
-1. If you have not done so already, ensure that your Docker CLI is targeting the minikube Docker engine with `eval $(minikube docker-env)`.
+1. If you have not done so already, ensure that your Docker CLI is targeting the minikube Docker engine with `eval $(minikube docker-env)`
 1. Build the docker image by running `docker build -t microservice-vote .`
 1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
 1. You can view the status of your deployment by running `kubectl get deployments`
