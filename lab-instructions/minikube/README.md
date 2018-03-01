@@ -16,5 +16,5 @@ This is the simplest way for a developer to get the sample up and running locall
 1. Build the sample microservice by running `cd ubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
 1. If you have not done so already, ensure that your Docker CLI is targeting the minikube Docker engine with `minikube docker-env`.
 1. Build the docker image by running `docker build -t microservice-vote .`
-1. Deploy the microservice with the following helm install command `helm install --name=vote chart/microservice-vote`
+1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
 1. Use `kubectl get ing` to determine the address of the `web-application-ingress`  Open this location in a web browser to access the sample. 
