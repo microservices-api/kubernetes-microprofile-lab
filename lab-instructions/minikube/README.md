@@ -18,4 +18,4 @@ This is the simplest way for a developer to get the sample up and running locall
 1. Build the docker image by running `docker build -t microservice-vote .`
 1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
 1. You can view the status of your deployment by running `kubectl get deployments`
-1. Use `kubectl get ing` to determine the address of the `/vote` application.  Open this location in a web browser to access the sample. 
+1. Use `kubectl get ing` to determine the address of the `/vote` application.  Open this location in a web browser to access the application. For example, `https://192.168.99.100/vote` 
