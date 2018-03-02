@@ -17,5 +17,5 @@ This is the simplest way for a developer to get the sample up and running locall
 1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
 1. Build the docker image by running `docker build -t microservice-vote .`
 1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
-1. You can view the status of your deployment by running `kubectl get deployments`
-1. Use `kubectl get ing` to determine the address of the `/vote` application.  Open this location in a web browser to access the application. For example, `https://192.168.99.100/vote` 
+1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until both `microservice-vote-deployment` and `vote-ibm-cloudant-dev` deployments are available.
+1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application.  Prepend `https` and append `/openapi/ui` to that URL and open this location in a web browser to access the application. For example, `https://192.168.99.100/openapi/ui` 
