@@ -11,13 +11,13 @@ image:
       cpu: 200m
       memory: 300Mi
 service:
-  type: ClusterIP
+  type: NodePort
   servicePort: 9080
   servicePortHttps: 9443
 ingress:
   enabled: true
-  rewriteTarget: "/vote"
-  path: "/vote"
+  rewriteTarget: "/openapi/ui"
+  path: "/openapi/ui"
 hpa:
   enabled: false
   minReplicas: 1
