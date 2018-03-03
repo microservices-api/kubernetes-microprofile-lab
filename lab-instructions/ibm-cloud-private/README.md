@@ -1,4 +1,4 @@
-# Deploying a MicroProfile application in an IBM Cloud private cluster
+# Deploying a MicroProfile application in an IBM Cloud Private cluster
 
 This is the simplest way for a developer to get a kubernetes cluster up and running locally.
 
