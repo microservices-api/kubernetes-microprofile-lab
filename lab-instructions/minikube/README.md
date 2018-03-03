@@ -1,6 +1,6 @@
 # Deploying a MicroProfile application in a minikube cluster
 
-This is the simplest way for a developer to get the sample up and running locally.
+This is the simplest way for a developer to get a kubernetes cluster up and running locally.
 
 ## Before you begin
 
@@ -31,3 +31,7 @@ This is the simplest way for a developer to get the sample up and running locall
 The `vote` application is using various MicroProfile specifications.  The `/openapi` endpoint of the application exposes the [MicroProfile OpenAPI](http://download.eclipse.org/microprofile/microprofile-open-api-1.0.1/microprofile-openapi-spec.html) specification.  The `/openapi/ui` endpoint is a value-add from [Open Liberty](https://openliberty.io/), which WebSphere Liberty is based upon.  This UI allows developers and API consumers to invoke the API right from the browser!
 
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
+1. Leave the `id` empty, and place your name in the `name` field.
+![image](images/post_screenshot.png)
+1. Click on the `execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.
+
