@@ -1,6 +1,6 @@
 # MicroProfile Application Helm Chart
 
-## Microservice - ote
+## Microservice - Vote
 
 This helm chart deploys a sample MicroProfile Application called "Vote", which
 illustrates a microservice that manages the votes pertaining to a conference session.
