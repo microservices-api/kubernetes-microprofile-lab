@@ -1,14 +1,17 @@
-# Deploying a MicroProfile application in an IBM Cloud Private cluster
+# Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
 
-This is the simplest way for a developer to get a kubernetes cluster up and running locally.
+This lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the instructions for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
-## Before you begin
+Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this lab we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.  
 
-* Install a Git client to obtain the sample code.
-* Install [Maven](https://maven.apache.org/download.cgi) and a Java 8 JDK.
-* Install a [Docker](https://docs.docker.com/engine/installation/) engine.
 
-## Install minikube and fabric artifacts
+## Install and setup IBM Cloud Private (ICP)
+
+1. Install ICP from [here](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.1/installing/installing.html).  You may choose the free Community Edition or one of the paid bundles.  
+1. Add the lab's helm repository to ICP.  On the main left-side menu, click on `Manage -> Helm Repositories`.  Click on the `Add repository` button and choose an unique name, and the following URL `https://microservices-api.github.io/kubernetes-microprofile-lab/lab-artifacts/helm-chart/repo`.
+
+
+## Deploy the and fabric artifacts
 
 1. Install minikube and the Microservice Builder fabric as described in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
 1. Enable ingress with the command `minikube addons enable ingress`
