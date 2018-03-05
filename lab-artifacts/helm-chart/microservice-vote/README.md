@@ -1,6 +1,6 @@
 # MicroProfile Application Helm Chart
 
-## Microservice - ote
+## Microservice - Vote
 
 This helm chart deploys a sample MicroProfile Application called "Vote", which
 illustrates a microservice that manages the votes pertaining to a conference session.
@@ -12,7 +12,7 @@ any of the defaults.
 
 The chart will:
 *  Deploy a sub-chart that installs and configures a Cloudant pod.
-*  Create the necessary config maps, secrets and persistent volumes
+*  Create the necessary config maps, secrets and persistent volumes.
 *  Deploy a docker container containing WebSphere Liberty and the MicroProfile Vote application.
 
 After deployment, you can interact with the application by running the built-in
