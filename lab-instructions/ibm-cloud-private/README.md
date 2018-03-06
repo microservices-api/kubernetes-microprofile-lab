@@ -14,17 +14,20 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 
 ## Deploy the fabric artifacts
 
-1. The Microservice Builder (MSB) helm chart is part of the pre-loaded set of charts available in the Catalog, loaded from the [public repository](https://github.com/ibm/charts). So instead performing steps 2-5 in the [helm MSB setup](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment) you can simply go into the Catalog and deploy the `Microservice Builder Fabric` helm chart, by clicking on it and taking all the defaults - you just need to select a release name and the `default` namespace.
+1. The Microservice Builder (MSB) helm chart is part of the pre-loaded set of charts available in the Catalog, loaded from the [public repository](https://github.com/ibm/charts). So instead of performing steps 2-5 in the [helm MSB setup](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment) you can simply go into the Catalog and deploy the `Microservice Builder Fabric` helm chart, by clicking on it and taking all the defaults - you just need to select a release name and the `default` namespace.
 ![MSB Fabric](images/catalog_msb.png)
 1.  You can check on the status of the fabric deployment by clicking on `Workloads -> Deployments` and then clicking on `fabric-zipkin`.  Proceed with the lab once the deployment is available.
 
 
-## Build application and container
+## Build the application and docker container
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
-1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
 1. Build the docker image by running `docker build -t microservice-vote .`
+
+
+## Upload the docker image to IBM Cloud Private's docker registry
+1. 
 
 ## Deploy WebSphere Liberty and Cloudant helm chart
 
