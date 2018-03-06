@@ -9,6 +9,7 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 
 1. Install ICP from [here](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.1/installing/installing.html).  You may choose the free Community Edition or one of the paid bundles.  
 1. Add the lab's helm repository to ICP.  On the main left-side menu, click on `Manage -> Helm Repositories`.  Click on the `Add repository` button and choose an unique name, and the following URL `https://microservices-api.github.io/kubernetes-microprofile-lab/lab-artifacts/helm-chart/repo`.
+![image](images/catalog_repository.png)
 
 
 ## Deploy the and fabric artifacts
