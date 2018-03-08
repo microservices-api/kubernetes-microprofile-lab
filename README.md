@@ -1,4 +1,7 @@
 # Kubernetes MicroProfile Lab
+
+![Think 2018 Logo](think_logo.png)
+
 This lab illustrates steps to deploy a MicroProfile application in a Kubernetes environment.  You can choose the following flavours of Kubernetes for the lab:
 
 *  [Instructions for Minikube](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/minikube): light weight single-node k8, recommended to run in a developer's laptop.
