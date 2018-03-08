@@ -48,3 +48,6 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Feel free to explore the other APIs and play around with the microservice! 
 1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
 
+## Cleanup
+
+To cleanup the deployment and various related artifacts (configMaps, secrets, etc) from your minikube cluster, simply run `./clean-minikube`
