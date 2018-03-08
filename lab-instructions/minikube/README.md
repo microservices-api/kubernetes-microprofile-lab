@@ -8,6 +8,13 @@ This is the simplest way for a developer to get a kubernetes cluster up and runn
 * Install [Maven](https://maven.apache.org/download.cgi) and a Java 8 JDK.
 * Install a [Docker](https://docs.docker.com/engine/installation/) engine.
 
+The lab machine you're using should have these installed.  You can verify by running:
+```
+git --version
+mvn --version
+docker --version
+```
+
 ## Install minikube and fabric artifacts
 
 1. Install minikube and the Microservice Builder fabric as described in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
