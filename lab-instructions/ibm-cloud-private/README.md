@@ -23,15 +23,16 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
-1. Build the docker image by running `docker build -t microservice-vote .`
-
+1. Build and tag the docker image by running `docker build -t microservice-vote .`
 
 ## Upload the docker image to IBM Cloud Private's docker registry
-1. 
+1. We will use IBM Cloud Private's internal docker registry to host our docker image.  This allows our image to remain secured on-premises, while being available to your enterprise.  You can control which kubernetes namespace they are available under.
+1. Follow the instruction on [this page](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.1/manage_images/using_docker_cli.html) to `login` and `push` your tagged image (`microservice-vote`) into the ICP docker registry.  
+1. Your image is now available in the ICP registry.   For example, if your `<cluster_CA_domain>` is `mycluster.icp` and you used the `default` namespace, then your image is available at `mycluster.icp:8500/default/arthurdm/websphere-liberty`
 
 ## Deploy WebSphere Liberty and Cloudant helm chart
 
-1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
+1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote --set image.repository=mycluster.icp:8500/default/microservice-vote`  (Note:  If may have a different `image.repository` value depending on what you set while pushing the image into the repository.)
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until both `microservice-vote-deployment` and `vote-ibm-cloudant-dev` deployments are available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application.  Prepend `https` and append `/openapi/ui` to that URL and open this location in a web browser to access the application. For example, `https://192.168.99.100/openapi/ui`
 1. Congratulations, you have successfully deployed a [MicroProfile](http://microprofile.io/) container into a kubernetes cluster!  The deployment also included a Cloudant container that is used by our microservice, and an ingress layer to provide connectivity into the API.
