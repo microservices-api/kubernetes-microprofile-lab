@@ -2,11 +2,11 @@ apiVersion: v1
 entries:
   microservice-vote:
   - apiVersion: v1
-    created: 2018-03-05T12:05:28.693937-05:00
+    created: 2018-03-09T18:22:57.581648-05:00
     description: A Helm chart for Kubernetes
     digest: 046001134ac8bb59a347d00e4dfbe12aae884810c869dea93b5f682b8c385ea2
     name: microservice-vote
     urls:
     - microservice-vote-1.0.0.tgz
     version: 1.0.0
-generated: 2018-03-05T12:05:28.692557-05:00
+generated: 2018-03-09T18:22:57.580429-05:00
