@@ -28,7 +28,8 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 ## Upload the docker image to IBM Cloud Private's docker registry
 
 1. We will use IBM Cloud Private's internal docker registry to host our docker image.  This allows our image to remain secured on-premises, while being available to your enterprise.  You can control which kubernetes namespace they are available under.
-1. Follow the instruction on [this page](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.1/manage_images/using_docker_cli.html) to `login` and `push` your tagged image (`microservice-vote`) into the ICP docker registry.  
+1. Follow the instruction on [this page](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.1/manage_images/using_docker_cli.html) to `login` into the ICP docker registry.  Use the credentials you setup during installation (default is `admin/admin`). 
+1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP docker registry.  Example:  `docker push microservice-vote 
 1. Your image is now available in the ICP registry, which you can verify by going into `Catalog -> Images`.   As an example, if your `<cluster_CA_domain>` is `mycluster.icp` and you used the `default` namespace, then your image is available at `mycluster.icp:8500/default/microservice-vote`
 
 ## Deploy WebSphere Liberty and Cloudant helm chart
