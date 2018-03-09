@@ -36,11 +36,11 @@ We will use IBM Cloud Private's internal docker registry to host our docker imag
 
 ## Deploy WebSphere Liberty and Cloudant helm chart
 
-1. We are now ready to deploy the Liberty and Cloudant helm chart by using the built-in catatalog in ICP.  Simply navigate to `Catalog -> Helm Charts`, click on the `microservice-vote` chart and notice that you are presented with a documentation of the helm chart.  
-image goes here
+1. We are now ready to deploy the Liberty and Cloudant helm chart by using the built-in catatalog in ICP.  Simply navigate to `Catalog -> Helm Charts`, click on the `microservice-vote` chart.
+![Helm Chart](images/chart.png)
 
 1.  Click on `Configure` at the bottom of the page and change the value of `image.repository` to match the image name you uploaded earlier.  For example:
-image goes here with mycluster.icp:8500/default/microservice-vote
+
 
 1. Click on deploy. 
 
