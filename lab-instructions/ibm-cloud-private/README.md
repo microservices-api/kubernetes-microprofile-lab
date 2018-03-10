@@ -8,7 +8,7 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 ## Install and setup IBM Cloud Private (ICP)
 
 1. Install ICP from [here](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.1/installing/installing.html).  You may choose the free Community Edition or one of the paid bundles.  
-1. Add the lab's helm repository to ICP.  On the main left-side menu, click on `Manage -> Helm Repositories`.  Click on the `Add repository` button and choose an unique name, and the following URL `https://microservices-api.github.io/kubernetes-microprofile-lab/lab-artifacts/helm-chart/repo`.
+1. Add the lab's helm repository to ICP.  On the main left-side menu, click on `Manage -> Helm Repositories`.  Click on the `Add repository` button and choose an unique name, and the following URL `https://microservices-api.github.io/kubernetes-microprofile-lab/lab-artifacts/helm-chart/repository`.
 ![Catalog Repository](images/catalog_repository.png)
 
 
@@ -39,14 +39,10 @@ We will use IBM Cloud Private's internal docker registry to host our docker imag
 1. We are now ready to deploy the Liberty and Cloudant helm chart by using the built-in catatalog in ICP.  Simply navigate to `Catalog -> Helm Charts`, click on the `microservice-vote` chart.
 ![Helm Chart](images/chart.png)
 
-1.  Click on `Configure` at the bottom of the page and change the value of `image.repository` to match the image name you uploaded earlier.  For example:
-
-
-1. Click on deploy. 
-
-
-
-For example, `https://192.168.99.100/openapi/ui`
+1. You will notice that a `readme` page is displayed, which allows you to familiarize yourself with the helm chart before deploying.  Click on `Configure` at the bottom of the page.
+1. Provide a release name (e.g. `microservice-vote`) and pick `default` as the namespace.  Change the value of `image.repository` to match the image name you uploaded earlier, for example `mycluster.icp:8500/default/microservice-vote`.  Leave the other defaults as-is.
+1. Click on deploy.  A helm deployment success window pops up!
+1. Let's check on our deployment.    For example, `https://192.168.99.100/openapi/ui`
 1. Congratulations, you have successfully deployed a [MicroProfile](http://microprofile.io/) container into a kubernetes cluster!  The deployment also included a Cloudant container that is used by our microservice, and an ingress layer to provide connectivity into the API.
 
 ## Explore the application
@@ -63,6 +59,11 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Click on `execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our WebSphere Liberty microservice into the Cloudant database.
 1. Feel free to explore the other APIs and play around with the microservice!
 1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
+
+## Further exploration
+
+1.  After playing around with the application you can explore the helm chart to become more familiar with the way WebSphere Liberty is deployed and how it is integrated with the Cloudant subchart.
+1.  You can also explore the official helm charts from IBM, available publicly at https://github.com/IBM/charts/tree/master/stable.  You will see there's an official version of the WebSphere Liberty and Open Liberty charts as well.  Try deploying these, along with other charts such as DB2.  
 
 ## Cleanup
 
