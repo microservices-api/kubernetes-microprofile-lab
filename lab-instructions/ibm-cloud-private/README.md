@@ -41,6 +41,8 @@ We will use IBM Cloud Private's internal docker registry to host our docker imag
 
 1. You will notice that a `readme` page is displayed, which allows you to familiarize yourself with the helm chart before deploying.  Click on `Configure` at the bottom of the page.
 1. Provide a release name (e.g. `microservice-vote`) and pick `default` as the namespace.  Change the value of `image.repository` to match the image name you uploaded earlier, for example `mycluster.icp:8500/default/microservice-vote`.  Leave the other defaults as-is.
+![Image Deployment](images/image_deployment.png)
+
 1. Click on deploy.  A helm deployment success window pops up!
 1. Let's check on our deployment.    For example, `https://192.168.99.100/openapi/ui`
 1. Congratulations, you have successfully deployed a [MicroProfile](http://microprofile.io/) container into a kubernetes cluster!  The deployment also included a Cloudant container that is used by our microservice, and an ingress layer to provide connectivity into the API.
