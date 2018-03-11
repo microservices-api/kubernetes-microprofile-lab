@@ -4,5 +4,5 @@
 
 This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty docker container, into a Kubernetes environment, such as IBM Cloud Private.  You can choose the following flavours of Kubernetes for the lab:
 
-*  [Instructions for Minikube](https://github.com/microservices-api/kubernetes-microprofile-lab/blob/master/lab-instructions/minikube/README.md): light weight single-node k8, recommended to run in a developer's laptop.
-*  [Instructions for IBM Cloud Private](https://github.com/microservices-api/kubernetes-microprofile-lab/blob/master/lab-instructions/ibm-cloud-private/README.md): enterprise-grade k8 with multiple nodes, recommended to run in different VMs.
+*  [Instructions for Minikube](https://microservices-api.github.io/kubernetes-microprofile-lab/lab-instructions/minikube): light weight single-node k8, recommended to run in a developer's laptop.
+*  [Instructions for IBM Cloud Private](https://microservices-api.github.io/kubernetes-microprofile-lab/lab-instructions/ibm-cloud-private): enterprise-grade k8 with multiple nodes, recommended to run in different VMs.
