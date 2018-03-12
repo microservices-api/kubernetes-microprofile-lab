@@ -51,13 +51,14 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and paste into the textbox the `id` you copied from the previous step.
 1. Click on `execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our WebSphere Liberty microservice into the Cloudant database.
 1. Feel free to explore the other APIs and play around with the microservice! 
-1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
-1. Now that you have deployed the lab in your local minikube environment, try out the IBM Cloud Private [instructions](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/ibm-cloud-private) for a production-grade environment.
+
 
 ## Further exploration
 
+1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
 1.  After playing around with the application you can explore the helm chart to become more familiar with the way WebSphere Liberty is deployed and how it is integrated with the Cloudant subchart.
 1.  You can also explore the official helm charts from IBM, available publicly at https://github.com/IBM/charts/tree/master/stable.  You will see there's an official version of the WebSphere Liberty and Open Liberty charts as well.  Try deploying these, along with other charts such as Db2.  
+1. Now that you have deployed the lab in your local minikube environment, try out the IBM Cloud Private [instructions](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/ibm-cloud-private) for a production-grade environment.
 
 
 ## Cleanup
