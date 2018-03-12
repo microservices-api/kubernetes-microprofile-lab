@@ -17,7 +17,7 @@ Although the exact same `helm` and `kubectl` instructions also work when targett
 1. The Microservice Builder (MSB) helm chart is part of the pre-loaded set of charts available in the Catalog, loaded from the [public repository](https://github.com/ibm/charts). So instead of performing steps 2-5 in the [helm MSB setup](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment) you can simply go into `Catalog -> Helm Charts` and deploy the `Microservice Builder Fabric` helm chart, by clicking on it and taking all the defaults - you just need to select a release name and the `default` namespace.
 ![MSB Fabric](images/catalog_msb.png)
 1.  You can check on the status of the fabric deployment by clicking on `Workloads -> Deployments` and then clicking on the deployment that matches the release name you chose in the previous step. Notice that ICP provides a nice helm chart management system, which allows you to `Upgrade` or `Rollback` a helm chart based on its version.
-![MSB Chart](images/deployment_msb.png)
+![MSB Chart](images/deployed_msb.png)
 1.  Proceed with the lab once the deployment is available.
 
 
