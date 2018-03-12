@@ -22,6 +22,7 @@ helm version
 ## Deploy the fabric artifacts
 
 1. Start minikube by running `minikube start`
+1. If using a lab machine, you may want to run the [cleanup script](#cleanup) before proceeding, to ensure you have a fresh environment.
 1. Install the Microservice Builder fabric as described in steps 2-6 in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
 1. Enable ingress with the command `minikube addons enable ingress`
 
