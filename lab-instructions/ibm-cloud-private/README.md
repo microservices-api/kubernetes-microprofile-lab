@@ -3,7 +3,7 @@
 This lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the lab for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
 Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this lab we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.  If at any point of the lab you want to switch back into using `helm` or `kubectl`, you can simply click on the top right icon and choose `Configure client` to copy the commands necessary to configure your local CLI to target the ICP cluster:
-![ICP CLI](client_config.png)
+![ICP CLI](images/client_config.png)
 
 
 ## Install and setup IBM Cloud Private (ICP)
