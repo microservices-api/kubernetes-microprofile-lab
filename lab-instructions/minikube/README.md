@@ -7,17 +7,22 @@ This is the simplest way for a developer to get a kubernetes cluster up and runn
 * Install a Git client to obtain the sample code.
 * Install [Maven](https://maven.apache.org/download.cgi) and a Java 8 JDK.
 * Install a [Docker](https://docs.docker.com/engine/installation/) engine.
+* Install minikube (run `curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/`)
+* Install helm (run `brew install kubernetes-helm`)
 
-The lab machine you're using should have these installed.  You can verify by running:
+The dev Zone lab machine you're using should have these installed.  You can verify by running:
 ```
 git --version
 mvn --version
 docker --version
+minikube version
+helm version
 ```
 
-## Install minikube and fabric artifacts
+## Deploy the fabric artifacts
 
-1. Install minikube and the Microservice Builder fabric as described in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
+1. Start minikube by running `minikube start`
+1. Install the Microservice Builder fabric as described in steps 2-6 in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
 1. Enable ingress with the command `minikube addons enable ingress`
 
 ## Build application and container
