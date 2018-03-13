@@ -4,7 +4,7 @@
 
 This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty docker container, into a Kubernetes environment, such as minikube (part 1) and IBM Cloud Private (part 2).
 
-Questions/comments about the lab:  arthurdm@ca.ibm.com
+For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email `Arthur De Magalhaes` at arthurdm@ca.ibm.com.  
 
 # Part 1: Deploying a MicroProfile application in a minikube cluster
 
