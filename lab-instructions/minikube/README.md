@@ -1,46 +1,52 @@
 # Deploying a MicroProfile application in a minikube cluster
 
-This is the simplest way for a developer to get a kubernetes cluster up and running locally.
+ In this lab you'll build a MicroProfile application and package it inside a WebSphere Liberty Docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
+ 
+ This is the simplest way for a developer to get a kubernetes cluster up and running locally in their laptop, before pushing the microservice into an enteprise grade environment such as IBM Cloud Private. 
 
-## Before you begin
-
-* Install a Git client to obtain the sample code.
-* Install [Maven](https://maven.apache.org/download.cgi) and a Java 8 JDK.
-* Install a [Docker](https://docs.docker.com/engine/installation/) engine.
-* Install minikube (run `curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/`)
-* Install helm (run `brew install kubernetes-helm`)
+## Step 0: Before you begin
 
 The dev Zone lab machine you're using should have these installed.  You can verify by running:
 ```
 git --version
 mvn --version
+java -version
 docker --version
 minikube version
 helm version
 ```
 
-## Deploy the fabric artifacts
+If any of these is not installed:
+* Install a [Git client](https://git-scm.com/download/mac).
+* Install [Maven](https://maven.apache.org/download.cgi).
+* Install a [Docker engine](https://docs.docker.com/engine/installation/).
+* Install Java 8(run `brew update` and `brew cask install java8`)
+* Install minikube (run `curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/`)
+* Install helm (run `brew install kubernetes-helm`)
+
+
+## Step 1: Deploy the fabric artifacts
 
 1. Start minikube by running `minikube start`
-1. If using a lab machine, you may want to run the [cleanup script](#cleanup) before proceeding, to ensure you have a fresh environment.
-1. Install the Microservice Builder fabric as described in steps 2-6 in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).
+1. Install the Microservice Builder fabric as described in steps 2-6 in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).  Note: If using the Think 2018 lab machine the fabric may already be installed, in which case you just need to check step 6 in the link above.
 1. Enable ingress with the command `minikube addons enable ingress`
 
-## Build application and container
+## Step 2: Build application and container
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
 1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
 1. Build the docker image by running `docker build -t microservice-vote .`
 
-## Deploy WebSphere Liberty and Cloudant helm chart 
+## Step 3: Deploy WebSphere Liberty and Cloudant helm chart 
 
+1. If using a lab machine, you may want to run the [cleanup script](#cleanup) before proceeding, to ensure you have a fresh environment.
 1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until both `microservice-vote-deployment` and `vote-ibm-cloudant-dev` deployments are available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application.  Prepend `https` and append `/openapi/ui` to that URL and open this location in a web browser to access the application. For example, `https://192.168.99.100/openapi/ui` 
 1. Congratulations, you have successfully deployed a [MicroProfile](http://microprofile.io/) container into a kubernetes cluster!  The deployment also included a Cloudant container that is used by our microservice, and an ingress layer to provide connectivity into the API. 
 
-## Explore the application
+## Step 4: Explore the application
 The `vote` application is using various MicroProfile specifications.  The `/openapi` endpoint of the application exposes the [MicroProfile OpenAPI](http://download.eclipse.org/microprofile/microprofile-open-api-1.0.1/microprofile-openapi-spec.html) specification.  The `/openapi/ui` endpoint is a value-add from [Open Liberty](https://openliberty.io/), which WebSphere Liberty is based upon.  This UI allows developers and API consumers to invoke the API right from the browser!
 
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
@@ -54,7 +60,7 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Feel free to explore the other APIs and play around with the microservice! 
 
 
-## Further exploration
+## Step 5: Further exploration
 
 1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
 1.  After playing around with the application you can explore the helm chart to become more familiar with the way WebSphere Liberty is deployed and how it is integrated with the Cloudant subchart.
@@ -62,6 +68,6 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Now that you have deployed the lab in your local minikube environment, try out the IBM Cloud Private [instructions](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/ibm-cloud-private) for a production-grade environment.
 
 
-## Cleanup
+## Step 6: Cleanup
 
 1. To cleanup the deployment and various related artifacts (configMaps, secrets, etc) from your minikube cluster, simply run `kubernetes-microprofile-lab/lab-artifacts/cleanup.sh`
