@@ -82,9 +82,9 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 # Part 2: Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
 
-This lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the lab for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
+This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the steps for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
-Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this lab we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.
+Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this section we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.
 
 If you do not have enough time to finish this part of the lab in the dev Zone you may continue this on your own time, as all the material needed is available at https://github.com/microservices-api/kubernetes-microprofile-lab.
 
