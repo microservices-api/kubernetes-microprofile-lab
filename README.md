@@ -1,4 +1,4 @@
-# Kubernetes MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
+# MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
 
 ![Think 2018 Logo](images/think_logo.png)
 
