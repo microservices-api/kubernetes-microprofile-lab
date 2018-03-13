@@ -136,10 +136,8 @@ We will use IBM Cloud Private's internal docker registry to host our docker imag
 
 ## Step 6: Explore the application
 
-1. You can now explore the application the exact same way you did in the minikube environment during part 1's [step 4](#step-4:-explore-the-application)
+1. You can now explore and invoke the application the exact same way you did in the minikube environment during part 1's Step 4.
 
-## Step 7: Further exploration
+## Step 7: Stay in sync
 
-1.  After playing around with the application you can explore the helm chart to become more familiar with the way WebSphere Liberty is deployed and how it is integrated with the Cloudant subchart.
-1.  You can also explore the official helm charts from IBM, available publicly at https://github.com/IBM/charts/tree/master/stable.  You will see there's an official version of the WebSphere Liberty and Open Liberty charts as well.  Try deploying these, along with other charts such as DB2.  
 1.  Join the ICP [technical community](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/W1559b1be149d_43b0_881e_9783f38faaff) to stay up to date with news related to IBM Cloud Private.
