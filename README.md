@@ -6,6 +6,8 @@ This lab illustrates steps to deploy a MicroProfile application, running in a We
 
 For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email `Arthur De Magalhaes` at arthurdm@ca.ibm.com.  
 
+This lab is available online at ibm.biz/was-icp
+
 # Part 1: Deploying a MicroProfile application in a minikube cluster
 
  In this part 1 of the lab you'll build a MicroProfile application and package it inside a WebSphere Liberty docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
