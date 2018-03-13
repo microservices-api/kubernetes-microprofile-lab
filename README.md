@@ -86,6 +86,7 @@ This lab will walk you through the deployment of our sample MicroProfile Applica
 
 Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this lab we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.
 
+If you do not have enough time to finish this part of the lab in the dev Zone you may continue this on your own time, as all the material needed is available at https://github.com/microservices-api/kubernetes-microprofile-lab.
 
 ## Step 1: Install and setup IBM Cloud Private (ICP)
 
@@ -142,7 +143,6 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 ![image](images/post_screenshot.png)
 1. Click on the `execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  Copy the `id` from the `Response body`.  This entry has now been saved into the Cloudant database that our microservice is using.
 ![image](images/post_result.png)
-*Note:*  If you find that your minikube ingress is taking too long to return the result of the invocation and you get a timeout error, you can bypass the ingress and reach the application via its NodePort layer.  To do that, simply find the NodePort port by running the command `kubectl describe service microservice-vote-service | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://192.168.99.100:30698/openapi/ui/`
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and paste into the textbox the `id` you copied from the previous step.
 1. Click on `execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our WebSphere Liberty microservice into the Cloudant database.
 1. Feel free to explore the other APIs and play around with the microservice!
