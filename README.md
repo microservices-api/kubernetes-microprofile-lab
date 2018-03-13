@@ -136,17 +136,7 @@ We will use IBM Cloud Private's internal docker registry to host our docker imag
 
 ## Step 6: Explore the application
 
-The `vote` application is using various MicroProfile specifications.  The `/openapi` endpoint of the application exposes the [MicroProfile OpenAPI](http://download.eclipse.org/microprofile/microprofile-open-api-1.0.1/microprofile-openapi-spec.html) specification.  The `/openapi/ui` endpoint is a value-add from [Open Liberty](https://openliberty.io/), which WebSphere Liberty is based upon.  This UI allows developers and API consumers to invoke the API right from the browser!
-
-1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
-1. Leave the `id` empty, and place your name in the `name` field.
-![image](images/post_screenshot.png)
-1. Click on the `execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  Copy the `id` from the `Response body`.  This entry has now been saved into the Cloudant database that our microservice is using.
-![image](images/post_result.png)
-1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and paste into the textbox the `id` you copied from the previous step.
-1. Click on `execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our WebSphere Liberty microservice into the Cloudant database.
-1. Feel free to explore the other APIs and play around with the microservice!
-1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
+1. You can now explore the application the exact same way you did in the minikube environment during part 1's [step 4](#step-4:-explore-the-application)
 
 ## Step 7: Further exploration
 
