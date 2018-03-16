@@ -8,6 +8,12 @@ For questions/comments about WebSphere Liberty's docker container or IBM Cloud P
 
 This lab is available online at ibm.biz/was-icp
 
+# Part 0: Register to this Think 2018 quicklab
+
+1. Go to http://ibm.biz/startmylab
+1. Select `Learn about IBM Cloud Private and WebSphere as Part of Your Journey to the Cloud` lab from the dropdown and click Ok
+1. You will be brought to the sign up page to register for an IBM Cloud Platform account.  If you do not have an account, please register for one in order to complete the lab.  If you do have an account, please proceed ahead to the next step.
+
 # Part 1: Deploying a MicroProfile application in a minikube cluster
 
  In this part 1 of the lab you'll build a MicroProfile application and package it inside a WebSphere Liberty docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
@@ -82,13 +88,15 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 1. To cleanup the deployment and various related artifacts (configMaps, secrets, etc) from your minikube cluster, simply run `kubernetes-microprofile-lab/lab-artifacts/cleanup.sh`
 
-# Part 2: Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
+# Part 2: [Take Home Lab] Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
+
+We recommend deploying a few VMs for this part of the lab, therefore it is meant to be a "take home" lab.
+These instructions are available at ibm.biz/was-icp.  You may continue reading the instructions here to
+familiarize yourself with the functionality available in ICP.  
 
 This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the steps for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
 Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this section we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.
-
-If you do not have enough time to finish this part of the lab in the dev Zone you may continue this on your own time, as all the material needed is available at https://github.com/microservices-api/kubernetes-microprofile-lab.
 
 ## Step 1: Install and setup IBM Cloud Private (ICP)
 
