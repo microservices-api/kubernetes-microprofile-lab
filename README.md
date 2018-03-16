@@ -81,7 +81,7 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. If you want to update the application, you can change the source code and then run through the steps starting from `Build application and container`.  You'll notice that the OpenAPI UI will get automatically updated!
 1.  After playing around with the application you can explore the helm chart to become more familiar with the way WebSphere Liberty is deployed and how it is integrated with the Cloudant subchart.
 1.  You can also explore the official helm charts from IBM, available publicly at https://github.com/IBM/charts/tree/master/stable.  You will see there's an official version of the WebSphere Liberty and Open Liberty charts as well.  Try deploying these, along with other charts such as Db2.  
-1. Now that you have deployed the lab in your local minikube environment, try out the IBM Cloud Private [instructions](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/lab-instructions/ibm-cloud-private) for a production-grade environment.
+1. Now that you have deployed the lab in your local minikube environment, try out the IBM Cloud Private instructions from Part 2 (a take home lab) for a production-grade environment!
 
 
 ## Step 6: Cleanup
