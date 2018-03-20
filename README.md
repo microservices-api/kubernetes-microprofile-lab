@@ -8,6 +8,8 @@ For questions/comments about WebSphere Liberty's docker container or IBM Cloud P
 
 This lab is available online at ibm.biz/was-icp
 
+You can find all the referenced GitHub artifacts at https://github.com/microservices-api/kubernetes-microprofile-lab
+
 # Part 0: Register to this Think 2018 quicklab
 
 1. Go to http://ibm.biz/startmylab
