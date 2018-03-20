@@ -10,12 +10,6 @@ This lab is available online at ibm.biz/was-icp
 
 You can find all the referenced GitHub artifacts at https://github.com/microservices-api/kubernetes-microprofile-lab
 
-# Part 0: Register to this Think 2018 quicklab
-
-1. Go to http://ibm.biz/startmylab
-1. Select `Learn about IBM Cloud Private and WebSphere as Part of Your Journey to the Cloud` lab from the dropdown and click Ok
-1. You will be brought to the sign up page to register for an IBM Cloud Platform account.  If you do not have an account, please register for one in order to complete the lab.  If you do have an account, please proceed ahead to the next step.
-
 # Part 1: Deploying a MicroProfile application in a minikube cluster
 
  In this part 1 of the lab you'll build a MicroProfile application and package it inside a WebSphere Liberty docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
