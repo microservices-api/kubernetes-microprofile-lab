@@ -84,11 +84,7 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 1. To cleanup the deployment and various related artifacts (configMaps, secrets, etc) from your minikube cluster, simply run `kubernetes-microprofile-lab/lab-artifacts/cleanup.sh`
 
-# Part 2: [Take Home Lab] Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
-
-We recommend deploying a few VMs for this part of the lab, therefore it is meant to be a "take home" lab.
-These instructions are available at ibm.biz/was-icp.  You may continue reading the instructions here to
-familiarize yourself with the functionality available in ICP.  
+# Part 2: Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
 
 This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the steps for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
