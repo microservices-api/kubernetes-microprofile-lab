@@ -31,7 +31,7 @@ If any of these is not installed:
 * Install [Maven](https://maven.apache.org/download.cgi).
 * Install a [Docker engine](https://docs.docker.com/engine/installation/).
 * Install Java 8(run `brew update` and `brew cask install java8`)
-* Install minikube (run `curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/`)
+* Install [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 * Install helm (run `brew install kubernetes-helm`)
 
 
