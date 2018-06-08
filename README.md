@@ -37,7 +37,6 @@ If any of these is not installed:
 ## Step 1: Deploy the fabric artifacts
 
 1. Start minikube by running `minikube start`
-1. Install the Microservice Builder fabric as described in steps 2-6 in [Running Kubernetes in your development environment](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment).  Note: If using the Think 2018 lab machine the fabric may already be installed, in which case you just need to check step 6 in the link above.
 1. Enable ingress with the command `minikube addons enable ingress`
 
 ## Step 2: Build application and container
