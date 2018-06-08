@@ -4,8 +4,6 @@ This lab illustrates steps to deploy a MicroProfile application, running in a We
 
 For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email `Arthur De Magalhaes` at arthurdm@ca.ibm.com.  
 
-This lab is available online at ibm.biz/was-icp
-
 You can find all the referenced GitHub artifacts at https://github.com/microservices-api/kubernetes-microprofile-lab
 
 # Part 1: Deploying a MicroProfile application in a minikube cluster
