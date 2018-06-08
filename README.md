@@ -34,7 +34,7 @@ If any of these is not installed:
 * Install [helm](https://docs.helm.sh/using_helm/#installing-helm)
 
 
-## Step 1: Deploy the fabric artifacts
+## Step 1: Configure minikube
 
 1. Start minikube by running `minikube start`
 1. Enable ingress with the command `minikube addons enable ingress`
