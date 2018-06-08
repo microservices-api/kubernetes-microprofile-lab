@@ -14,7 +14,8 @@ For questions/comments about WebSphere Liberty's docker container or IBM Cloud P
 
 ## Step 0: Before you begin
 
-The dev Zone lab machine you're using should have these installed.  You can verify by running:
+You'll need a few different artifacts to this lab.  Check if you have these installed by running:
+
 ```
 git --version
 mvn --version
