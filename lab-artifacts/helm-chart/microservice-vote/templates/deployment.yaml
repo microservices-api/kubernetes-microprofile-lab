@@ -94,36 +94,14 @@ spec:
             value: admin
           - name: PASSWORD
             value: password
-          - name: MB_KEYSTORE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mb-keystore-password
-                key: password
-          - name: MB_TRUSTSTORE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mb-truststore-password
-                key: password
         volumeMounts:
-        - name: keystore
-          mountPath: /etc/wlp/config/keystore
-        - name: truststore
-          mountPath: /etc/wlp/config/truststore
         - name: liberty-config
           mountPath: /config/configDropins
       volumes:
-       - name: keystore
-         secret:
-           secretName: mb-keystore
-       - name: truststore
-         secret:
-           secretName: mb-truststore
        - name: liberty-config
          configMap:
            name: liberty-logging-config
            items:
-             - key: keystore.xml
-               path: defaults/keystore.xml
              - key: logging.xml
                path: defaults/logging.xml
            optional: true
