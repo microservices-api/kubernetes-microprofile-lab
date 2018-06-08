@@ -29,9 +29,9 @@ If any of these is not installed:
 * Install a [Git client](https://git-scm.com/download/mac).
 * Install [Maven](https://maven.apache.org/download.cgi).
 * Install a [Docker engine](https://docs.docker.com/engine/installation/).
-* Install Java 8(run `brew update` and `brew cask install java8`)
+* Install [Java 8](https://java.com/en/download/)
 * Install [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-* Install helm (run `brew install kubernetes-helm`)
+* Install [helm](https://docs.helm.sh/using_helm/#installing-helm)
 
 
 ## Step 1: Deploy the fabric artifacts
