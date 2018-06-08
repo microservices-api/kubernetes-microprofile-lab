@@ -38,13 +38,13 @@ If any of these is not installed:
 
 1. Start minikube by running `minikube start`
 1. Enable ingress with the command `minikube addons enable ingress`
+1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
 
 ## Step 2: Build application and container
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
-1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
-1. Build the docker image by running `docker build -t microservice-vote .`
+1. Build the docker image by running `docker build -t microservice-vote .`  This image is now availble in minikube's Docker registry.
 
 ## Step 3: Deploy WebSphere Liberty and Cloudant helm chart
 
