@@ -4,7 +4,7 @@ This lab illustrates steps to deploy a MicroProfile application, running in a We
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
-For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email `Arthur De Magalhaes` at arthurdm@ca.ibm.com.  
+For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email [Arthur De Magalhaes](arthurdm@ca.ibm.com).
 
 # Part 1: Deploying a MicroProfile application in a minikube cluster
 
