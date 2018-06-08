@@ -94,15 +94,4 @@ spec:
             value: admin
           - name: PASSWORD
             value: password
-        volumeMounts:
-        - name: liberty-config
-          mountPath: /config/configDropins
-      volumes:
-       - name: liberty-config
-         configMap:
-           name: liberty-logging-config
-           items:
-             - key: logging.xml
-               path: defaults/logging.xml
-           optional: true
 {{ end }}
