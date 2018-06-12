@@ -46,7 +46,7 @@ If any of these is not installed:
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
-1. Build the docker image by running `docker build -t microservice-vote .`  This image is now availble in minikube's Docker registry.
+1. Build the docker image by running `docker build -t microservice-vote .`  This image is now availble in minikube's Docker registry. If you run `docker images` you will see all the images in your minikube's registry.
 
 ## Step 3: Deploy WebSphere Liberty and Cloudant helm chart
 
