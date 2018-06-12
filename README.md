@@ -39,6 +39,8 @@ If any of these is not installed:
 1. Start minikube by running `minikube start`
 1. Enable ingress with the command `minikube addons enable ingress`
 1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
+1. Set up helm and tiller by running `helm init`
+1. Wait until the following command indicates that the tiller-deploy deployment is available: `kubectl get deployment tiller-deploy --namespace kube-system`
 
 ## Step 2: Build application and container
 
