@@ -50,7 +50,7 @@ If any of these is not installed:
 
 ## Step 3: Deploy WebSphere Liberty and Cloudant helm chart
 
-1. If using a lab machine, you may want to run the [cleanup script](#cleanup) before proceeding, to ensure you have a fresh environment.
+1. If using a lab machine, you may want to run the [cleanup script](#step-6-cleanup) before proceeding, to ensure you have a fresh environment.
 1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote`
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until both `microservice-vote-deployment` and `vote-ibm-cloudant-dev` deployments are available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
