@@ -33,6 +33,7 @@ If any of these is not installed:
 * Install [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 * Install [helm](https://docs.helm.sh/using_helm/#installing-helm)
 
+This lab has been tested on Mac OSX (High Sierra), Ubuntu 16.04 and Windows 10, but it should work with any OS that supports the above software.
 
 ## Step 1: Configure minikube
 
