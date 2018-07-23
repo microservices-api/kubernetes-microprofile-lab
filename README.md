@@ -1,18 +1,12 @@
 # MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
 
-This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty docker container, into a Kubernetes environment, such as minikube (part 1) and IBM Cloud Private (part 2).
+This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty docker container, into a Kubernetes environment, such as [minikube (part 1)](https://github.com/microservices-api/kubernetes-microprofile-lab#part-1-deploying-a-microprofile-application-in-a-minikube-cluster) and [IBM Cloud Private (part 2)](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploying-a-microprofile-application-in-an-ibm-cloud-private-cluster-icp).
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
 For questions/comments about WebSphere Liberty's docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
 
-# Part 1: Deploying a MicroProfile application in a minikube cluster
-
- In this part 1 of the lab you'll build a MicroProfile application and package it inside a WebSphere Liberty docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
-
- This is the simplest way for a developer to get a kubernetes cluster up and running locally in their laptop, before pushing the microservice into an enteprise grade environment such as IBM Cloud Private.
-
-## Step 0: Before you begin
+# Before you begin
 
 You'll need a few different artifacts to this lab.  Check if you have these installed by running:
 
@@ -34,6 +28,12 @@ If any of these is not installed:
 * Install [helm](https://docs.helm.sh/using_helm/#installing-helm)
 
 This lab has been tested on Mac OSX (High Sierra), Ubuntu 16.04 and Windows 10, but it should work with any OS that supports the above software.
+
+# Part 1: Deploying a MicroProfile application in a minikube cluster
+
+ In this part 1 of the lab you'll build a MicroProfile application and package it inside a WebSphere Liberty docker container. You will then utilize a helm chart that deploys the Liberty container into a kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant helm chart that stands up the database that holds the data for this microservice.  
+
+ This is the simplest way for a developer to get a kubernetes cluster up and running locally in their laptop, before pushing the microservice into an enteprise grade environment such as IBM Cloud Private.
 
 ## Step 1: Configure minikube
 
