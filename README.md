@@ -88,58 +88,40 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster.  You'll notice that we're using the exact same artifacts (helm charts & docker containers) as the steps for minikube, which reinforces the fact that ICP is built on the open source Kubernetes framework.  
 
-Although the exact same `helm` and `kubectl` instructions also work when targetting an ICP cluster, in this section we'll take an alternative path to the minikube instructions to showcase ICP's helm chart catalog via its user interface.
-
 ## Step 1: Install and setup IBM Cloud Private (ICP)
 
-1. Install ICP from [here](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.1/installing/installing.html).  You may choose the free Community Edition or one of the paid bundles.
-1. If at any point of the lab you want to switch back into using `helm` or `kubectl`, you can simply click on the top right icon and choose `Configure client` to copy the commands necessary to configure your local CLI to target the ICP cluster:
+1. Install ICP from [here](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.3/installing/installing.html).  You may choose the free Community Edition or one of the paid bundles.
+1. The `helm` CLI in ICP is protected by TLS, so you need to follow [these instructions](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.3/app_center/create_helm_cli.html) to setup a protected connected between your machine (client) and the ICP cluster you want to reach.
+1. Once the TLS certificates are in place, you can always go into `Configure client` to copy the commands necessary to configure your local CLI to target the ICP cluster:
 ![ICP CLI](images/client_config.png)
-1. Add the lab's helm repository to ICP.  On the main left-side menu, click on `Manage -> Helm Repositories`.  Click on the `Add repository` button and choose an unique name, and the following URL `https://microservices-api.github.io/kubernetes-microprofile-lab/lab-artifacts/helm-chart/repository`.
-![Catalog Repository](images/helm_repo.png)
+1. We will be using the private docker image registry from ICP, so you'll need to [setup the connection](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.3/manage_images/configuring_docker_cli.html) so that you can login into that registry later in the lab.
 
-
-## Step 2: Deploy the fabric artifacts
-
-1. The Microservice Builder (MSB) helm chart is part of the pre-loaded set of charts available in the Catalog, loaded from the [public repository](https://github.com/ibm/charts). So instead of performing steps 2-5 in the [helm MSB setup](https://www.ibm.com/support/knowledgecenter/SS5PWC/setup.html#running-kubernetes-in-your-development-environment) you can simply go into `Catalog -> Helm Charts` and deploy the `Microservice Builder Fabric` helm chart, by clicking on it and taking all the defaults - you just need to select a release name and the `default` namespace.
-![MSB Fabric](images/catalog_msb.png)
-1.  You can check on the status of the fabric deployment by clicking on `Workloads -> Deployments` and then clicking on the deployment that matches the release name you chose in the previous step. Notice that ICP provides a nice helm chart management system, which allows you to `Upgrade` or `Rollback` a helm chart based on its version.
-![MSB Chart](images/deployed_msb.png)
-1.  Proceed with the lab once the deployment is available.
-
-
-## Step 3: Build the application and docker container
+## Step 2: Build the application and docker container
 
 1. Clone the project into your machine by running `git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git`
 1. Build the sample microservice by running `cd kubernetes-microprofile-lab/lab-artifacts` and then  `mvn clean package`
 1. Build and tag the docker image by using `docker build` and providing a tag that matches your `<cluster_CA_domain>/<namespace>/microservice-vote`.   As an example, if your `<cluster_CA_domain>` is `mycluster.icp` and you used the `default` namespace, then your command would be `docker build -t mycluster.icp:8500/default/microservice-vote`
 
-## Step 4: Upload the docker image to IBM Cloud Private's docker registry
+## Step 3: Upload the docker image to IBM Cloud Private's docker registry
 
 We will use IBM Cloud Private's internal docker registry to host our docker image.  This allows our image to remain secured on-premises, while being available to your enterprise.  You can control which kubernetes namespace they are available under.
 
-1. Follow the instruction on [this page](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.1/manage_images/using_docker_cli.html) to `docker login` into the ICP docker registry.  Use the credentials you setup during installation (default is `admin/admin`).
+1. Follow the instruction on [this page](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_2.1.0.3/manage_images/using_docker_cli.html) to `docker login` into the ICP docker registry.  Use the credentials you setup during installation (default is `admin/admin`).
 1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP docker registry.  Example:  `docker push mycluster.icp:8500/default/microservice-vote`
 1. Your image is now available in the ICP registry, which you can verify by going into `Catalog -> Images`.   
 ![Images Repository](images/images_repo.png)
 
-## Step 5: Deploy WebSphere Liberty and Cloudant helm chart
+## Step 4: Deploy WebSphere Liberty and Cloudant helm chart
 
-1. We are now ready to deploy the Liberty and Cloudant helm chart by using the built-in catatalog in ICP.  Simply navigate to `Catalog -> Helm Charts`, click on the `microservice-vote` chart.
-![Helm Chart](images/chart.png)
-
-1. You will notice that a `readme` page is displayed, which allows you to familiarize yourself with the helm chart before deploying.  Click on `Configure` at the bottom of the page.
-1. Provide a release name (e.g. `microservice-vote`) and pick `default` as the namespace.  Change the value of `image.repository` to match the image name you uploaded earlier, for example `mycluster.icp:8500/default/microservice-vote`.  Leave the other defaults as-is.
-![Image Deployment](images/image_deployment.png)
-
-1. Click on deploy.  A helm deployment success window pops up!
+1. Deploy the microservice with the following helm install command `helm install --name=vote helm-chart/microservice-vote --set image.repository=mycluster.icp:8500/default/microservice-vote`
+1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until both `microservice-vote-deployment` and `vote-ibm-cloudant-dev` deployments are available.
 1. Let's check on our deployment.  Go into `Workloads -> Deployments` and click on the release name you picked.  Click on the `Endpoint` link, which brings up the ingress URL.   Add `/openapi/ui` to the URL to reach the OpenAPI User Interface.   For example, `https://192.168.99.100/openapi/ui`
 1. Congratulations, you have successfully deployed a [MicroProfile](http://microprofile.io/) container into a kubernetes cluster!  The deployment also included a Cloudant container that is used by our microservice, and an ingress layer to provide connectivity into the API.
 
-## Step 6: Explore the application
+## Step 5: Explore the application
 
 1. You can now explore and invoke the application the exact same way you did in the minikube environment during part 1's Step 4.
 
-## Step 7: Stay in sync
+## Step 6: Stay in sync
 
 1.  Join the ICP [technical community](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/W1559b1be149d_43b0_881e_9783f38faaff) to stay up to date with news related to IBM Cloud Private.
