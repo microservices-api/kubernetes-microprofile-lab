@@ -1,3 +1,5 @@
+![Overview](images/top_diagram.png)
+
 # MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
 
 This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty docker container, into a Kubernetes environment, such as [minikube (part 1)](https://github.com/microservices-api/kubernetes-microprofile-lab#part-1-deploying-a-microprofile-application-in-a-minikube-cluster) and [IBM Cloud Private (part 2)](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploying-a-microprofile-application-in-an-ibm-cloud-private-cluster-icp).
