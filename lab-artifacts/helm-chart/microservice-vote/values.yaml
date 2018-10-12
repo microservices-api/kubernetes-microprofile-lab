@@ -15,7 +15,7 @@ service:
   servicePort: 9080
   servicePortHttps: 9443
 ingress:
-  enabled: true
+  enabled: false
   rewriteTarget: "/openapi/ui"
   path: "/openapi/ui"
 hpa:
@@ -60,7 +60,7 @@ ibm-cloudant-dev:
     name: "cloudant-pvc"
     ## specify the storageClassName you want to use
     ## if you don't specify a storageClassName it will use the default
-    storageClassName: ""
+    storageClassName: "nfs-client"
     ## Specify the name of the Existing Claim to be used by your application
     ## empty string means don't use an existClaim
     existingClaimName: ""
