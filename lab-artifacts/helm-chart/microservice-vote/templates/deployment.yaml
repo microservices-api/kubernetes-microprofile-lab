@@ -89,7 +89,7 @@ spec:
                 name: cloudant-secret
                 key: dbPassword
           - name: dbUrl
-            value: "http://{{ .Chart.Name | trunc 46 | trimSuffix "-" }}-ibm-cloudant-dev"
+            value: "http://{{ .Release.Name | trunc 46 | trimSuffix "-" }}-ibm-cloudant-dev"
           - name: USERNAME
             value: admin
           - name: PASSWORD
