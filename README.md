@@ -42,8 +42,10 @@ This part of the lab will walk you through the deployment of our sample MicroPro
 
 In this lab you will use a few command line interfaces (CLIs):
 
-* `kubectl` is a powerful tool for running commands against any Kubernetes clusters including ICP.
-* `cloudctl` is a command line tool to interact with IBM Cloud Private.
+* `docker`: A tool that acts as a client to interact with Docker daemon.
+* `kubectl`: A powerful tool for running commands against any Kubernetes clusters including ICP.
+* `cloudctl`: A command line tool to interact with IBM Cloud Private.
+* `helm`: Is a tool for managing Kubernetes charts which are packages of pre-configured Kubernetes resources.
 
 To access your cluster using these tools, you need to log in to your cluster. Once you are logged in, a protected connection between your machine (client) and the ICP cluster you want to reach will be set up.
 
@@ -99,7 +101,7 @@ You can access your IBM Cloud Private cluster management console from a web brow
 
 ## Vote Microservice
 
-The vote microservice stores feedback from the sessions and displays how well all sessions were liked in a pie chart.  If the vote service is configured (via server.xml) to connect to a CouchDB database, the votes will be persisted.  Otherwise, the vote data will simply be stored in-memory. This sample application is one of the MicroProfile [showcase](https://github.com/eclipse/microprofile-conference/tree/master/microservice-vote) applications.
+The vote microservice stores feedback from the sessions and displays how well all sessions were liked in a pie chart.  If the vote service is configured (via server.xml) to connect to a Cloudant database, the votes will be persisted. Otherwise, the vote data will simply be stored in-memory. This sample application is one of the MicroProfile [showcase](https://github.com/eclipse/microprofile-conference/tree/master/microservice-vote) applications.
 
 You can clone the lab artifacts and explore the application:
 
@@ -121,7 +123,7 @@ You can clone the lab artifacts and explore the application:
 
 * **JSON-P** is used to implement custom JAX-RS MessageBodyReader/Writer classes for binding between JSON and POJO.
 
-* **MicroProfile Config** is used to inject CouchDB's URL, username and password to the application.
+* **MicroProfile Config** is used to inject Cloudant's URL, username and password to the application.
 
 * **MicroProfile Fault-Tolerance** is used in the CouchAttendeeDAO and CouchSessionRatingDAO to:
 
@@ -132,10 +134,8 @@ You can clone the lab artifacts and explore the application:
 * **MicroProfile Health** is used to provide an UP/DOWN health check of the service.  The following health checks are implemented:
 
   * HashMapDAO to determine if the in-memory storage is accessible (which is always) and gives an example of an UP status.
-  * CouchAttendeeDAO to determine if it can connect to the CouchDB backend.
-  * CouchSessionDAO to determine if it can connect to the CouchDB backend.
-
-* **CouchDB** is a NoSQL database.  It's not part of MicroProfile, but is used here to persist vote information
+  * CouchAttendeeDAO to determine if it can connect to the database backend.
+  * CouchSessionDAO to determine if it can connect to the database backend.
 
 * **MicroProfile Metrics** is used to gather metrics about the time it takes the HashMapDAO objects to complete their operations, and to keep a count of the amount of times each REST endpoint is requested.
 
@@ -202,7 +202,7 @@ We will use IBM Cloud Private's internal Docker registry to host our image.  Thi
 
 You can use ICP Dashboard to deploy Helm charts into your Kubernetes cluster through the Catalog page. In addition, you can use Helm command line tool to install a Helm chart which we will do in this part of the lab.
 
-First, let's see what are Helm charts. Helm is a package manager for Kubernetes (analogous to yum and apt). You can use it for managing Kubernetes charts (analogous to debs and rpms), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
+First, let's see what are **Helm charts**. Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
 
 Now let's deploy our workload using Helm charts:
 
@@ -210,11 +210,17 @@ Now let's deploy our workload using Helm charts:
     ```bash
     helm install --name=vote-<USERNAME> helm-chart/microservice-vote --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --tls
     ```
-1. You can view the status of your deployment:
+1. Run the following command to see the state of deployments:
     ```bash
     kubectl get deployments
     ```
-    You want to wait until both `microservice-vote-deployment` and `vote-<NAMESPACE>-ibm-cloudant-dev` deployments are available.
+    You should get an output similar to the following:
+    ```bash
+    NAME                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+    microservice-vote-deployment    1         1         1            1           8h
+    vote-userX-ibm-cloudant-dev     1         1         1            1           8h
+    ```
+    You might need to wait until the database deployment is available, indicated by `1` in the *AVAILABLE* column.
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
 1. Select the namespace that is same as your username.
@@ -225,7 +231,7 @@ Now let's deploy our workload using Helm charts:
 1. Release page shows all the Kubernetes resources create on the cluster.
 1. See that there are two resources created under **Service**.
 1. Click on `microservice-vote-service`. This would take to to another page.
-1. You should see two links for **Node port**, `http` and `https`. Click on either link.
+1. You should see two links for **Node port**, `http` and `https`. Click on either link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. TYou can ignore this error.
 1. You should see the Open Liberty Welcome Page.
 1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
@@ -237,9 +243,9 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
 1. Place your username (e.g. userX) in the `id` field, and place your name in the `name` field.
     ![image](images/post_screenshot.png)
-1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  Copy the `id` from the `Response body`.  This entry has now been saved into the Cloudant database that our microservice is using.
+1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  This entry has now been saved into the Cloudant database that our microservice is using.
     ![image](images/post_result.png)
-1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and paste into the textbox the `id` you copied from the previous step.
+1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and type into the textbox the `id` you entered from the previous step.
 1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our Open Liberty microservice into the Cloudant database.
 1. Feel free to explore the other APIs and play around with the microservice!
 
@@ -253,29 +259,16 @@ In order to store the data outside of the database container, you would need ena
 
 The steps below would guide you how to enable persistence for your database:
 
-1. If you did [Part 3](#Part-3-Explore-the-application), you should have seen that calling `GET /attendee/{id}` should have returned the `name` you specified. Calling `GET` would read the data from the database.
-1. Find the pod name running the database container. You should see a pod name similar to `vote-<NAMESPACE>-ibm-cloudant-dev-84489f78cb-h78dx`.
+1. If you did [Part 3](#Part-3-Explore-the-application), you should have seen that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
+1. Find the pod name running the database container:
     ```bash
     kubectl get pods --namespace <NAMESPACE>
     ```
-1. Delete the Cloudant pod. Replace `<POD_NAME>` with the pod name from the previous step:
+    You should see a pod name similar to `vote-<NAMESPACE>-ibm-cloudant-dev-84489f78cb-h78dx`.
+1. Delete the Cloudant pod which deletes the container running the database. Replace `<POD_NAME>` with the pod name from the previous step:
     ```bash
-    kubectl delete pod <POD_NAME> --namespace default
+    kubectl delete pod <POD_NAME> --namespace <NAMESPACE>
     ```
-1. Call the `GET /attendee` endpoint again and see that the server does not return any attendee from the database.
-1. Navigate into the sample application directory:
-    ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts
-    ```
-1. Now let's enable persistence for our database pod
-    ```bash
-    helm upgrade vote-<USERNAME> helm-chart/microservice-vote --set ibm-cloudant-dev.persistence.enabled=true --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --tls
-    ```
-1. List the deployed packages with their chart versions by running:
-    ```bash
-    helm ls --namespace <NAMESPACE> --tls
-    ```
-    You can see that the number of revisions should be 2 now.
 1. Run the following command to see the state of deployments:
     ```bash
     kubectl get deployments --namespace <NAMESPACE>
@@ -286,11 +279,43 @@ The steps below would guide you how to enable persistence for your database:
     microservice-vote-deployment    1         1         1            1           8h
     vote-userX-ibm-cloudant-dev     1         1         1            1           8h
     ```
-    You might need to wait until the database deployments are all ready.
-1. Now repeat [Part 3](#Part-3-Explore-the-application) to add a new attendee.
-1. Now repeat Steps 1-4 in this part to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
+    You might need to wait until the database deployment is available.
+1. Call the `GET /attendee` endpoint from the OpenAPI UI page and see that the server does not return any attendee from the database.
+1. Navigate into the sample application directory if you are not already:
+    ```bash
+    cd kubernetes-microprofile-lab/lab-artifacts
+    ```
+1. Now let's enable persistence for our database:
+    ```bash
+    helm upgrade vote-<USERNAME> helm-chart/microservice-vote --set ibm-cloudant-dev.persistence.useDynamicProvisioning=true --set ibm-cloudant-dev.persistence.enabled=true --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --recreate-pods --tls
+    ```
+1. List the deployed packages with their chart versions by running:
+    ```bash
+    helm ls --namespace <NAMESPACE> --tls
+    ```
+    You can see that the number of revisions should be 2 now.
+1. Run the following command to see the state of deployments:
+    ```bash
+    kubectl get deployments --namespace <NAMESPACE>
+    ```
+    You need to wait until the all the deployments are all ready.
+1. Add a new attendee through the OpenAPI UI.
+1. Now repeat Steps 1-5 in this part to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
 
-## Further reading
+In this part you were introduced with rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
+
+Congratulations! You finished the lab! You got to use a few powerful tools to interact with Kubernetes to deploy a microservice into IBM Cloud Private. Although this lab is finished but the journey to Kubernetes should not end here! Head to the [Learn more](#learn-more) section to see other great resources.
+
+## Shared Cluster
+
+Here are some details about the shared cluster used during CASCON 2018 workshop:
+
+* IBM Cloud Private 3.1.0 is installed on the cluster
+* The cluster has one master node and one worker node.
+* An LDAP server was setup to manage user access.
+* [NFS client provisioner](https://github.com/helm/charts/tree/master/stable/nfs-client-provisioner) Helm chart is installed on the cluster. The NFS client provisioner is an automatic provisioner for Kubernetes that uses your already configured NFS server, automatically creating Persistent Volumes.
+
+## Learn more
 
 * [Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
 * [IBM Cloud Private: Deploying Microservices with Kubernetes](https://www.coursera.org/learn/deploy-micro-kube-icp)
@@ -305,12 +330,3 @@ Join the ICP [technical community](https://www.ibm.com/developerworks/community/
  In the bonus section you'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a helm chart that deploys the Liberty container into a Kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant Helm chart that stands up the database that holds the data for this microservice.  
 
  We will walk you through the deployment of our sample MicroProfile Application into a minikube. You'll notice that we're using the exact same artifacts (Helm charts & Docker containers) as the steps for ICP. However, minikube is the simplest way for a developer to get a Kubernetes cluster up and running locally in their laptop.
-
-# Shared Cluster
-
-Here are some details about the shared cluster used during CASCON 2018 workshop:
-
-* IBM Cloud Private 3.1.0 is installed on the cluster
-* The cluster has one master node and one worker node.
-* An LDAP server was setup to manage user access.
-* [NFS client provisioner](https://github.com/helm/charts/tree/master/stable/nfs-client-provisioner) Helm chart is installed on the cluster. The NFS client provisioner is an automatic provisioner for Kubernetes that uses your already configured NFS server, automatically creating Persistent Volumes.
