@@ -157,11 +157,7 @@ This Dockerfile describes that our container is built on top of `open-liberty:mi
 
 The following steps will build the sample application and create a docker image that includes the vote microservice:
 
-1. Clone the project into your machine. You can skip this step if you have already cloned the repository.
-    ```bash
-    git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
-    ```
-1. Navigate into the sample application directory:
+1. Navigate into the sample application directory if you are not already:
     ```bash
     cd kubernetes-microprofile-lab/lab-artifacts
     ```
