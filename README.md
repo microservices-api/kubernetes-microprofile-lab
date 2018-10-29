@@ -55,7 +55,7 @@ To access your cluster using these tools, you need to log in to your cluster. On
     cloudctl login -a https://mycluster.icp:8443 -c id-mycluster-account --skip-ssl-validation
     ```
     Your machine is setup to resolve `mycluster.icp` into the ip address of the master node of a shared ICP cluster.
-1. Enter the credentials provided to you.
+1. Enter the credentials: admin/admin
 1. Pick the namespace that is same as your username.
 1. Once you are successfully logged in, you should see the following message:
     ```bash
@@ -91,7 +91,7 @@ To access your cluster using these tools, you need to log in to your cluster. On
 You can access your IBM Cloud Private cluster management console from a web browser.
 
 1. From a web browser, browse to the URL for your cluster. The URL is `https://mycluster.icp:8443`.
-1. Enter the credentials provided to you.
+1. Enter the credentials: admin/admin
 1. From the top horizontal menu bar, click Catalog.
 1. The Catalog provides a centralized location from which you can browse for and install Helm charts in your cluster. A chart consists of templates for a set of resources necessary to run an application and includes a values file that configures the resources.
 1. From the top left main Menu, click on **Workloads** and then **Helm Releases**.
@@ -182,7 +182,7 @@ The following steps will build the sample application and create a docker image 
 
 We will use IBM Cloud Private's internal Docker registry to host our image.  This allows our image to remain secured on-premises, while being available to your enterprise.  You can control which Kubernetes namespace they are available under.
 
-1. Log in to your private image registry using the provided credentials:
+1. Log in to your private image registry using the provided credential (admin/admin):
     ```bash
     docker login mycluster.icp:8500
     ```
