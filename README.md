@@ -228,10 +228,10 @@ Now let's deploy our workload using Helm charts:
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
 1. Click on your Helm release name. You can use the search box to find it.
-1. Release page shows all the Kubernetes resources create on the cluster.
+1. Release page shows all the Kubernetes resources created on the cluster.
 1. See that there are two resources created under **Service**.
-1. Click on `microservice-vote-service`. This would take to to another page.
-1. You should see two links for **Node port**, `http` and `https`. Click on either link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. TYou can ignore this error.
+1. Click on `microservice-vote-service`. This would take you to another page.
+1. You should see two links for **Node port**, `http` and `https`. Click on either link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
 1. You should see the Open Liberty Welcome Page.
 1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
@@ -246,26 +246,26 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  This entry has now been saved into the Cloudant database that our microservice is using.
     ![image](images/post_result.png)
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and type into the textbox the `id` you entered from the previous step.
-1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created 2 steps ago. You successfully triggered a fetch from our Open Liberty microservice into the Cloudant database.
+1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our Open Liberty microservice into the Cloudant database.
 1. Feel free to explore the other APIs and play around with the microservice!
 
 # Part 4: Update the Helm release
 
 In this part of the lab you will practice how to make changes to the Helm release you just deployed on the cluster using the Helm CLI.
 
-So far, the database you deployed stores the data inside the container running the database. This means if the container gets deleted or restart for any reason, all the data stored in the database would be lost.
+So far, the database you deployed stores the data inside the container running the database. This means if the container gets deleted or restarted for any reason, all the data stored in the database would be lost.
 
-In order to store the data outside of the database container, you would need enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by a automatic provisioner.
+In order to store the data outside of the database container, you would need to enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by a automatic provisioner.
 
 The steps below would guide you how to enable persistence for your database:
 
-1. If you did [Part 3](#Part-3-Explore-the-application), you should have seen that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
-1. Find the pod name running the database container:
+1. In [Part 3](#Part-3-Explore-the-application), you would've observed that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
+1. Find the name of the pod that is running the database container:
     ```bash
     kubectl get pods --namespace <NAMESPACE>
     ```
     You should see a pod name similar to `vote-<NAMESPACE>-ibm-cloudant-dev-84489f78cb-h78dx`.
-1. Delete the Cloudant pod which deletes the container running the database. Replace `<POD_NAME>` with the pod name from the previous step:
+1. Delete the Cloudant pod to delete the container running the database. Replace `<POD_NAME>` with the pod name from the previous step:
     ```bash
     kubectl delete pod <POD_NAME> --namespace <NAMESPACE>
     ```
@@ -300,9 +300,9 @@ The steps below would guide you how to enable persistence for your database:
     ```
     You need to wait until the all the deployments are all ready.
 1. Add a new attendee through the OpenAPI UI.
-1. Now repeat Steps 1-5 in this part to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
+1. Now repeat Steps 1-5 in this section to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
 
-In this part you were introduced with rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
+In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
 
 Congratulations! You finished the lab! You got to use a few powerful tools to interact with Kubernetes to deploy a microservice into IBM Cloud Private. Although this lab is finished but the journey to Kubernetes should not end here! Head to the [Learn more](#learn-more) section to see other great resources.
 
@@ -327,6 +327,6 @@ Join the ICP [technical community](https://www.ibm.com/developerworks/community/
 
 # [Bonus: Deploying a MicroProfile application in a minikube cluster](minikube/README.md)
 
- In the bonus section you'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a helm chart that deploys the Liberty container into a Kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant Helm chart that stands up the database that holds the data for this microservice.  
+ In the bonus/take-home section you'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a helm chart that deploys the Liberty container into a Kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Cloudant Helm chart that stands up the database that holds the data for this microservice.  
 
  We will walk you through the deployment of our sample MicroProfile Application into a minikube. You'll notice that we're using the exact same artifacts (Helm charts & Docker containers) as the steps for ICP. However, minikube is the simplest way for a developer to get a Kubernetes cluster up and running locally in their laptop.
