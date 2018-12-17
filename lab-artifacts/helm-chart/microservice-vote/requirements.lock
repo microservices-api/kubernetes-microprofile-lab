@@ -1,6 +1,9 @@
 dependencies:
-- name: ibm-cloudant-dev
+- name: ibm-websphere-liberty
   repository: https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-  version: 1.0.2
-digest: sha256:e449b4ab64b752df8e5d60ccd76433ffc16a1ecafdf6ec301a721646f29e11cb
-generated: 2018-02-05T10:42:51.303729776-05:00
+  version: 1.7.0
+- name: couchdb
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  version: 1.0.0
+digest: sha256:70bed5dea98cd5d5642aab2078cce6cb4fd634a4726f13b3dd71d54590d4b9f3
+generated: 2018-12-17T13:42:41.596271894-05:00
