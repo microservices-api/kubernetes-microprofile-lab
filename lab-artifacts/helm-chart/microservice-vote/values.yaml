@@ -1,74 +1,426 @@
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-replicaCount: 1
-revisionHistoryLimit: 1
-image:
-  repository: microservice-vote
-  tag: latest
-  pullPolicy: IfNotPresent
-  resources:
-    requests:
-      cpu: 200m
-      memory: 300Mi
-service:
-  type: NodePort
-  servicePort: 9080
-  servicePortHttps: 9443
-ingress:
-  enabled: false
-  rewriteTarget: "/openapi/ui"
-  path: "/openapi/ui"
-hpa:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 2
-  metrics:
-    cpu:
-      targetAverageUtilization: 70
-    memory:
-      targetAverageUtilization: 70
-services:
-base:
-  enabled: false
-  replicaCount: 1
-  image:
-    tag : v0.9.9
-  weight: 100
-istio:
-  enabled: false
-  weight: 100
-test: false
+ibm-websphere-liberty:
+  ###############################################################################
+  # Licensed Materials - Property of IBM.
+  # Copyright IBM Corporation 2017. All Rights Reserved.
+  # U.S. Government Users Restricted Rights - Use, duplication or disclosure
+  # restricted by GSA ADP Schedule Contract with IBM Corp.
+  #
+  # Contributors:
+  #  IBM Corporation - initial API and implementation
+  ###############################################################################
 
 
-## Cloudant parameters
-ibm-cloudant-dev:
-  ## image parameters
+  ###############################################################################
+  ## Common image variables
+  ###############################################################################
   image:
-    repository: ibmcom/cloudant-developer
+    repository: microservice-vote
     tag: latest
-    pullPolicy: Always
-  initImage:
-    repository: "ibmcom/icp-initcontainer"
-    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+    license: ""
 
-  ## global persistence parameters
-  persistence:
+    extraEnvs:
+    - name: "isAppDown"
+      value: "false"
+    - name: dbUsername
+      value: admin
+    - name: dbPassword
+      value: pass
+
+    lifecycle: {}
+    # Example:
+    # lifecycle:
+    #   postStart:
+    #     exec:
+    #       command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
+    #   preStop:
+    #     exec:
+    #       command: ["/usr/sbin/nginx","-s","quit"]
+
+    serverOverridesConfigMapName: ""
+    # Server Configuration Overrides
+    # Example:
+    # serverOverridesConfigMapName: "custom-server-configmap"
+
+    extraVolumeMounts: []
+    # Example:
+    # extraVolumeMounts:
+    #   - name: podinfo
+    #     mountPath: /podinfo
+    #     readOnly: false
+
+  resourceNameOverride: ""
+
+  deployment:
+    annotations: {}
+    # Example:
+    # annotations:
+    #   prometheus.io/scheme: "http"
+    #   prometheus.io/scrape: "true"
+
+    labels: {}
+    # Example:
+    # labels:
+    #   environment: "dev"
+    #   tier: "backend"
+
+  pod:
+    annotations: {}
+    # Example:
+    # annotations:
+    #   prometheus.io/scheme: "http"
+    #   prometheus.io/scrape: "true"
+
+    labels: {}
+    # Example:
+    # labels:
+    #   environment: "dev"
+    #   tier: "backend"
+
+    extraInitContainers: []
+    # Example:
+    # extraInitContainers:
+    # - name: init-myservice
+    #   image: busybox
+    #   command: ['sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;']
+
+    extraContainers: []
+    # Example:
+    # extraContainers:
+    # - name: my-sidecar
+    #  image: nginx:latest
+    # - name: lemonldap-ng-controller
+    #  image: lemonldapng/lemonldap-ng-controller:0.2.0
+    #  args:
+    #    - /lemonldap-ng-controller
+    #    - --alsologtostderr
+    #    - --configmap=$(POD_NAMESPACE)/lemonldap-ng-configuration
+    #  env:
+    #    - name: POD_NAME
+    #      valueFrom:
+    #        fieldRef:
+    #          fieldPath: metadata.name
+    #  volumeMounts:
+    #  - name: copy-portal-skins
+    #    mountPath: /srv/var/lib/lemonldap-ng/portal/skins
+
+    extraVolumes: []
+    # Example:
+    # extraVolumes:
+    #   - name: podinfo
+    #     downwardAPI:
+    #       items:
+    #         - path: "labels"
+    #           fieldRef:
+    #             fieldPath: metadata.labels
+    #         - path: "annotations"
+    #           fieldRef:
+    #             fieldPath: metadata.annotations
+
+  service:
+    enabled: true
+    name: microservice-vote
+    port: 9443
+    targetPort: 9443
+    type: NodePort
+    annotations: {}
+    # Example:
+    # annotations:
+    #   prometheus.io/path: "/custom/metrics"
+    #   prometheus.io/port: "9157"
+
+    labels: {}
+    # Example:
+    # labels:
+    #   environment: "dev"
+    #   tier: "backend"
+
+    extraPorts: []
+    # Example:
+    # extraPorts:
+    #   - protocol: TCP
+    #     port: 9444
+    #     targetPort: 9444
+    #     name: vhost-https
+
+    extraSelectors: {}
+    # Example:
+    # extraSelectors:
+    #   "environment": "dev"
+    #   "tier": "backend"
+
+  jmsService:
     enabled: false
-    useDynamicProvisioning: false
+    name: jms-liberty
+    port: 7286
+    targetPort: 7286
+    type: NodePort
 
-  databasePVC:
-    name: "cloudant-pvc"
-    ## specify the storageClassName you want to use
-    ## if you don't specify a storageClassName it will use the default
-    storageClassName: "nfs-client"
-    ## Specify the name of the Existing Claim to be used by your application
-    ## empty string means don't use an existClaim
-    existingClaimName: ""
-    size: 3Gi
+  iiopService:
+    enabled: false
+    name: iiop-liberty
+    nonSecurePort: 2809
+    nonSecureTargetPort: 2809
+    securePort: 9402
+    secureTargetPort: 9402
+    type: NodePort
 
-  ## database parameters
-  database:
-    readinessProbePeriodSeconds: 2
-    readinessProbeInitialDelaySeconds: 30
-    livenessProbePeriodSeconds: 2
-    livenessProbeInitialDelaySeconds: 200
+  ssl:
+    enabled: true
+    useClusterSSLConfiguration: false
+    createClusterSSLConfiguration: false
+
+  ingress:
+    enabled: false
+    rewriteTarget: "/openapi/ui"
+    path: "/openapi/ui"
+    host: ""
+    secretName: ""
+
+    annotations: {}
+    # Example:
+    # annotations:
+    #   nginx.ingress.kubernetes.io/enable-cors: "true"
+    #   nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+
+    labels: {}
+    # Example:
+    # labels:
+    #   environment: "dev"
+    #   tier: "backend"
+
+  ###############################################################################
+  ## Persistence Storage
+  ###############################################################################
+
+  ## Persistence is disabled by default, set Enabled: true to use
+  persistence:
+    name: "liberty-pvc"
+    ## Tranlog requires a Persistence Storage volume size minimum of 1Gi
+    size: "1Gi"
+
+    useDynamicProvisioning: true
+
+    ## Specify the name of the StorageClass
+    ## Setting StorageClass: "" will use whatever storageClass is currently
+    ## setup as the Default
+    storageClassName: ""
+
+    # if your not using dynamic provisioning, you can use selectors to
+    # refine the binding process. You cannot specify a selector if your using dynamic provisioning!
+    selector:
+      label: ""
+      value: ""
+
+  ###############################################################################
+  ## Logs
+  ###############################################################################
+  logs:
+    persistLogs: false
+    persistTransactionLogs: false
+    consoleFormat: json
+    consoleLogLevel: info
+    consoleSource: message,trace,accessLog,ffdc
+
+  ###############################################################################
+  ## MicroProfile
+  ###############################################################################
+  microprofile:
+    health:
+      enabled: true
+
+  ###############################################################################
+  ## Monitoring
+  ###############################################################################
+  monitoring:
+    enabled: true
+
+  ###############################################################################
+  ## Auto scaling
+  ###############################################################################
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 50
+
+  ###############################################################################
+  ## Resource constraints
+  ###############################################################################
+  resources:
+    constraints:
+      enabled: false
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  ###############################################################################
+  ## Architecture
+  ###############################################################################
+  # Specify architecture (amd64, ppc64le, s390x) and weight to be
+  # used for scheduling as follows :
+  #   0 - Do not use
+  #   1 - Least preferred
+  #   2 - No preference
+  #   3 - Most preferred
+  arch:
+    amd64: "3 - Most preferred"
+    ppc64le: "0 - Do not use"
+    s390x: "0 - Do not use"
+
+  ###############################################################################
+  ## Environmental variables
+  ###############################################################################
+  env:
+    jvmArgs: "-DdbUrl=http://couchdb-svc-couchdb:5984"
+
+  ###############################################################################
+  ## Session cache
+  ###############################################################################
+  sessioncache:
+    hazelcast:
+      enabled: false
+      image:
+        repository: hazelcast/hazelcast
+        tag: "3.10.4"
+        pullPolicy: IfNotPresent
+
+  ###############################################################################
+  ## Role-Based Access Control
+  ###############################################################################
+  rbac:
+    install: true
+
+
+
+couchdb:
+  fullnameOverride: couchdb
+
+  ## clusterSize is the initial size of the CouchDB cluster.
+  clusterSize: 1
+
+  ## If allowAdminParty is enabled the cluster will start up without any database
+  ## administrator account; i.e., all users will be granted administrative
+  ## access. Otherwise, the system will look for a Secret called
+  ## <ReleaseName>-couchdb containing `adminUsername`, `adminPassword` and
+  ## `cookieAuthSecret` keys. See the `createAdminSecret` flag.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  allowAdminParty: true
+
+  ## If createAdminSecret is enabled a Secret called <ReleaseName>-couchdb will
+  ## be created containing auto-generated credentials. Users who prefer to set
+  ## these values themselves have a couple of options:
+  ##
+  ## 1) The `adminUsername`, `adminPassword`, and `cookieAuthSecret` can be
+  ##    defined directly in the chart's values. Note that all of a chart's values
+  ##    are currently stored in plaintext in a ConfigMap in the tiller namespace.
+  ##
+  ## 2) This flag can be disabled and a Secret with the required keys can be
+  ##    created ahead of time.
+  createAdminSecret: false
+
+  adminUsername: admin
+  # adminPassword: this_is_not_secure
+  # cookieAuthSecret: neither_is_this
+
+  ## The storage volume used by each Pod in the StatefulSet. If a
+  ## persistentVolume is not enabled, the Pods will use `emptyDir` ephemeral
+  ## local storage. Setting the storageClass attribute to "-" disables dynamic
+  ## provisioning of Persistent Volumes; leaving it unset will invoke the default
+  ## provisioner.
+  persistentVolume:
+    enabled: false
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    # storageClass: "-"
+
+  ## The CouchDB image
+  image:
+    repository: couchdb
+    tag: 2.2.0
+    pullPolicy: IfNotPresent
+
+  ## Sidecar that connects the individual Pods into a cluster
+  helperImage:
+    repository: kocolosk/couchdb-statefulset-assembler
+    tag: 1.1.0
+    pullPolicy: IfNotPresent
+
+  ## CouchDB is happy to spin up cluster nodes in parallel, but if you encounter
+  ## problems you can try setting podManagementPolicy to the StatefulSet default
+  ## `OrderedReady`
+  podManagementPolicy: Parallel
+
+  ## To better tolerate Node failures, we can prevent Kubernetes scheduler from
+  ## assigning more than one Pod of CouchDB StatefulSet per Node using podAntiAffinity.
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values: 
+            - amd64
+
+  ## A StatefulSet requires a headless Service to establish the stable network
+  ## identities of the Pods, and that Service is created automatically by this
+  ## chart without any additional configuration. The Service block below refers
+  ## to a second Service that governs how clients connect to the CouchDB cluster.
+  service:
+    enabled: true
+    type: ClusterIP
+    externalPort: 5984
+
+  ## An Ingress resource can provide name-based virtual hosting and TLS
+  ## termination among other things for CouchDB deployments which are accessed
+  ## from outside the Kubernetes cluster.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: false
+    hosts:
+      - chart-example.local
+    annotations:
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    tls:
+      # Secrets must be manually created in the namespace.
+      # - secretName: chart-example-tls
+      #   hosts:
+      #     - chart-example.local
+
+  ## Optional resource requests and limits for the CouchDB container
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  resources: {}
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # limits:
+    #  cpu: 56
+    #  memory: 256Gi
+
+  ## erlangFlags is a map that is passed to the Erlang VM as flags using the
+  ## ERL_FLAGS env. `name` and `setcookie` flags are minimally required to
+  ## establish connectivity between cluster nodes.
+  ## ref: http://erlang.org/doc/man/erl.html#init_flags
+  erlangFlags:
+    name: couchdb
+    setcookie: monster
+
+  ## couchdbConfig will override default CouchDB configuration settings.
+  ## The contents of this map are reformatted into a .ini file laid down
+  ## by a ConfigMap object.
+  ## ref: http://docs.couchdb.org/en/latest/config/index.html
+  couchdbConfig:
+    # cluster:
+    #   q: 8 # Create 8 shards for each database
+    chttpd:
+      bind_address: any
+      # chttpd.require_valid_user disables all the anonymous requests to the port
+      # 5984 when is set to true.
+      require_valid_user: false
