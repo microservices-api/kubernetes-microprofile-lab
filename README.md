@@ -38,6 +38,14 @@ This lab has been tested on Mac OSX (High Sierra), Ubuntu 16.04 and Windows 10, 
 
 This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
+## Prerequisites
+
+1. The user's namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run
+  1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
+1. A ClusterImagePolicy must exist that allows the following registry URLs
+  1. `docker.io/kocolosk/couchdb-statefulset-assembler:*`
+  1. `docker.io/couchdb*`
+
 ## Accessing your cluster from CLI
 
 In this lab you will use a few command line interfaces (CLIs):
@@ -57,8 +65,6 @@ To access your cluster using these tools, you need to log in to your cluster. On
     Your machine is setup to resolve `mycluster.icp` into the ip address of the master node of a shared ICP cluster.
 1. Enter the credentials: admin/admin
 1. Pick the namespace that is same as your username.
-    1. The namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run
-    1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
 1. Once you are successfully logged in, you should see the following message:
     ```bash
     Configuring kubectl ...
