@@ -41,10 +41,10 @@ This part of the lab will walk you through the deployment of our sample MicroPro
 ## Prerequisites
 
 1. The user's namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run
-  1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
+    1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
 1. A ClusterImagePolicy must exist that allows the following registry URLs
-  1. `docker.io/kocolosk/couchdb-statefulset-assembler:*`
-  1. `docker.io/couchdb*`
+    1. `docker.io/kocolosk/couchdb-statefulset-assembler:*`
+    1. `docker.io/couchdb*`
 
 ## Accessing your cluster from CLI
 
