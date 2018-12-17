@@ -57,6 +57,8 @@ To access your cluster using these tools, you need to log in to your cluster. On
     Your machine is setup to resolve `mycluster.icp` into the ip address of the master node of a shared ICP cluster.
 1. Enter the credentials: admin/admin
 1. Pick the namespace that is same as your username.
+    1. The namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run
+    1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
 1. Once you are successfully logged in, you should see the following message:
     ```bash
     Configuring kubectl ...
@@ -204,7 +206,7 @@ Now let's deploy our workload using Helm charts:
 
 1. Deploy the microservice using Helm:
     ```bash
-    helm install --name=vote-<USERNAME> helm-chart/microservice-vote --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --tls
+    helm install --tls --name=vote-<USERNAME> --namespace=<NAMESPACE> helm-chart/microservice-vote --set ibm-websphere-liberty.image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote 
     ```
 1. Run the following command to see the state of deployments:
     ```bash
@@ -285,7 +287,7 @@ The steps below would guide you how to enable persistence for your database:
     ```
 1. Now let's enable persistence for our database:
     ```bash
-    helm upgrade vote-<USERNAME> helm-chart/microservice-vote --set couchdb.persistentVolume.enabled=true --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --recreate-pods --tls
+    helm upgrade --tls --recreate-pods --force --reuse-values --set couchdb.persistentVolume.enabled=true --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote vote-<USERNAME> helm-chart/microservice-vote
     ```
 1. List the deployed packages with their chart versions by running:
     ```bash
