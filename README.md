@@ -230,7 +230,7 @@ Now let's deploy our workload using Helm charts:
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
 1. Select the namespace that is same as your username.
-1. You should see a deployment and statefulset: `vote-userx-ibm-websphere` and `couchdb-couchdb` respectively
+1. You should see a deployment and statefulset: `vote-userx-ibm-websphere` and `couchdb-couchdb` respectively.
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
 1. Click on your Helm release name. You can use the search box to find it.
