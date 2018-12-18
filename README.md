@@ -230,14 +230,14 @@ Now let's deploy our workload using Helm charts:
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
 1. Select the namespace that is same as your username.
-1. You should see two deployments: `vote-userx-ibm-websphere` and `couchdb-couchdb`
+1. You should see a deployment and statefulset: `vote-userx-ibm-websphere` and `couchdb-couchdb` respectively
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
 1. Click on your Helm release name. You can use the search box to find it.
 1. Release page shows all the Kubernetes resources created on the cluster.
 1. See that there are two resources created under **Service**.
-1. Click on `microservice-vote-service`. This would take you to another page.
-1. You should see two links for **Node port**, `http` and `https`. Click on either link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
+1. Click on `vote-userx-ibm-websphere`. This would take you to another page.
+1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
 1. You should see the Open Liberty Welcome Page.
 1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
