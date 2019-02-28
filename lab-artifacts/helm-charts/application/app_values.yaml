@@ -18,8 +18,3 @@ ingress:
 microprofile:
   health:
     enabled: true
-
-arch:
-  amd64: "3 - Most preferred"
-  ppc64le: "0 - Do not use"
-  s390x: "0 - Do not use"

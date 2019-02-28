@@ -1,2 +1,2 @@
 helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-helm install incubator/couchdb --set clusterSize=1
+helm install incubator/couchdb -f db_values.yaml --tls
