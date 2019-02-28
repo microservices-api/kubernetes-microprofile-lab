@@ -1,7 +1,0 @@
-dependencies:
-- name: ibm-websphere-liberty
-  repository: https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-  version: 1.7.0
-- name: couchdb
-  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
-  version: 1.0.0

@@ -1,0 +1,25 @@
+image:
+  repository: microservice-vote
+  tag: latest
+  pullPolicy: IfNotPresent
+  license: ""
+
+  extraEnvs:
+  - name: "isAppDown"
+    value: "false"
+
+ingress:
+  enabled: true
+  rewriteTarget: "/openapi/ui"
+  path: "/vote"
+  host: ""
+  secretName: ""
+
+microprofile:
+  health:
+    enabled: true
+
+arch:
+  amd64: "3 - Most preferred"
+  ppc64le: "0 - Do not use"
+  s390x: "0 - Do not use"

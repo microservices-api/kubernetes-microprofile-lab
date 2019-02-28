@@ -1,0 +1,20 @@
+image:
+  extraEnvs:
+  - name: "dbUrl"
+    value: "http://couchdb-svc-couchdb:5984"
+  - name: dbUsername
+    valueFrom:
+      secretKeyRef:
+        name: couchdb-couchdb
+        key: adminUsername
+  - name: dbPassword
+    valueFrom:
+      secretKeyRef:
+        name: couchdb-couchdb
+        key: adminPassword
+
+monitoring:
+  enabled: true
+
+rbac:
+  install: true
