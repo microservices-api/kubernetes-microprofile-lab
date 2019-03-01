@@ -1,4 +1,4 @@
-![Overview](images/arch_diagram.png)
+![Overview](images/arch_diagram_new.png)
 
 # MicroProfile Lab with IBM Cloud Private and Open Liberty
 
