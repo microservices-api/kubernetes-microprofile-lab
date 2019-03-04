@@ -1,4 +1,0 @@
-helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-
-# right-most values takes precendence
-helm install ibm-charts/ibm-websphere-liberty -f app_values.yaml -f enterprise_values.yaml  --tls

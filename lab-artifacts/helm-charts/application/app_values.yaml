@@ -1,7 +1,7 @@
 image:
-  repository: microservice-vote
+  repository: greyjoy.icp:8500/arthurdm/microservice-vote
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   license: ""
 
   extraEnvs:
@@ -11,10 +11,12 @@ image:
 ingress:
   enabled: true
   rewriteTarget: "/openapi/ui"
-  path: "/vote"
-  host: ""
-  secretName: ""
+  path: "/docs"
 
 microprofile:
   health:
     enabled: true
+
+pod:
+  labels:
+    application: conference

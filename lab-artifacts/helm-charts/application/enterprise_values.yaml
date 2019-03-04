@@ -18,10 +18,10 @@ monitoring:
 
 resources:
   constraints:
-    enabled: true
+    enabled: false
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 5
 
