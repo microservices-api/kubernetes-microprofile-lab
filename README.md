@@ -57,14 +57,14 @@ In this lab you will use a few command line interfaces (CLIs):
 
 To access your cluster using these tools, you need to log in to your cluster. Once you are logged in, a protected connection between your machine (client) and the ICP cluster you want to reach will be set up.
 
-1. From desktop, open MATE Terminal.
+1. Log in to the VM that you set up previously. 
 1. Log in to your cluster:
     ```bash
     cloudctl login -a https://mycluster.icp:8443 -c id-mycluster-account --skip-ssl-validation
     ```
     Your machine is setup to resolve `mycluster.icp` into the ip address of the master node of a shared ICP cluster.
 1. Enter the credentials: admin/admin
-1. Pick the namespace that is same as your username.
+1. Select the `default` namespace when prompted. 
 1. Once you are successfully logged in, you should see the following message:
     ```bash
     Configuring kubectl ...
@@ -80,6 +80,19 @@ To access your cluster using these tools, you need to log in to your cluster. On
     Configuring helm: /home/student/.helm
     OK
     ```
+1. Create a unique namespace (For example: use your github username):
+    ```bash
+    kubectl create namespace <NAMESPACE>
+    ```
+1. Configure your namespace:
+    ```bash
+    kubectl -n <NAMESPACE> create rolebinding <NAMESPACE>-psp --clusterrole=ibm-anyuid-clusterrole --group=system:serviceaccounts:<NAMESPACE>
+    ```
+1. Log out of the cluster to exit from the `default` namespace:
+    ```bash
+    cloudctl logout
+    ```
+1. Log back into the cluster using the command from step 2 and 3. Then pick the namespace you had just created.
 1. You can now explore `kubectl` and `cloudctl` CLIs.
 1. Run the following commands to get familiar with these tools:
     1. `kubectl version`: Print the client and server version information.
@@ -98,7 +111,16 @@ To access your cluster using these tools, you need to log in to your cluster. On
 
 You can access your IBM Cloud Private cluster management console from a web browser.
 
-1. From a web browser, browse to the URL for your cluster. The URL is `https://mycluster.icp:8443`.
+1. Find out the master ip which we will use in the later steps:
+    ```bash
+    cloud cm masters
+    ```
+    You should get an output similar to the following:
+    ```bash
+    ID             Private IP     Machine Type   State      K8s Status
+    mycluster-m1   <MASTER_IP>    -              deployed   Ready
+    ```
+1. From a web browser, browse to the URL for your cluster. The URL is `https://<MASTER_IP>:8443`.
 1. Enter the credentials: admin/admin
 1. From the top horizontal menu bar, click Catalog.
 1. The Catalog provides a centralized location from which you can browse for and install Helm charts in your cluster. A chart consists of templates for a set of resources necessary to run an application and includes a values file that configures the resources.
@@ -214,6 +236,7 @@ Now let's deploy our workload using Helm charts:
     ```bash
     helm install --tls --name=vote-<USERNAME> --namespace=<NAMESPACE> helm-chart/microservice-vote --set ibm-websphere-liberty.image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote 
     ```
+    Note: create a unique username to distinguish your application from others, it is valid to have the same value for USERNAME and NAMESPACE.
 1. Run the following command to see the state of deployments:
     ```bash
     kubectl get deployments,statefulsets
@@ -229,14 +252,15 @@ Now let's deploy our workload using Helm charts:
     You might need to wait until the database deployment is available, indicated by `1` in the *AVAILABLE* column.
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
-1. Select the namespace that is same as your username.
-1. You should see a deployment and statefulset: `vote-userx-ibm-websphere` and `couchdb-couchdb` respectively.
+1. Select the namespace that belongs to you.
+1. You should see a deployment `vote-<USERNAME>-ibm-websphere`.
+1. Similarly, you will see `couchdb-couchdb` when you go into `Workloads -> Statefulsets` under your namespace.
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
 1. Click on your Helm release name. You can use the search box to find it.
 1. Release page shows all the Kubernetes resources created on the cluster.
-1. See that there are two resources created under **Service**.
-1. Click on `vote-userx-ibm-websphere`. This would take you to another page.
+1. See that there are four resources created under **Service**.
+1. Click on `vote-<USERNAME>-ibm-websphere`. This would take you to another page.
 1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
 1. You should see the Open Liberty Welcome Page.
 1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
@@ -277,7 +301,7 @@ The steps below would guide you how to enable persistence for your database:
     ```
 1. Run the following command to see the state of deployments:
     ```bash
-    kubectl get deployments --namespace <NAMESPACE>
+    kubectl get pods --namespace <NAMESPACE>
     ```
     You should get an output similar to the following:
     ```bash
@@ -302,10 +326,10 @@ The steps below would guide you how to enable persistence for your database:
     You can see that the number of revisions should be 2 now.
 1. Run the following command to see the state of deployments:
     ```bash
-    kubectl get deployments --namespace <NAMESPACE>
+    kubectl get pods --namespace <NAMESPACE>
     ```
-    You need to wait until the all the deployments are all ready.
-1. Add a new attendee through the OpenAPI UI.
+    You need to wait until the deployments are ready.
+1. Refresh the site, then add a new attendee through the OpenAPI UI.
 1. Now repeat Steps 1-5 in this section to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
 
 In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
@@ -316,9 +340,8 @@ Congratulations! You finished the lab! You got to use a few powerful tools to in
 
 Here are some details about the shared cluster used during CASCON 2018 workshop:
 
-* IBM Cloud Private 3.1.0 is installed on the cluster
-* The cluster has one master node and one worker node.
-* An LDAP server was setup to manage user access.
+* IBM Cloud Private 3.1.1 is installed on the cluster
+* The cluster has one master node and six worker node.
 * [NFS client provisioner](https://github.com/helm/charts/tree/master/stable/nfs-client-provisioner) Helm chart is installed on the cluster. The NFS client provisioner is an automatic provisioner for Kubernetes that uses your already configured NFS server, automatically creating Persistent Volumes.
 
 ## Learn more
