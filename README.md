@@ -88,11 +88,10 @@ To access your cluster using these tools, you need to log in to your cluster. On
     ```bash
     kubectl -n <NAMESPACE> create rolebinding <NAMESPACE>-psp --clusterrole=ibm-anyuid-clusterrole --group=system:serviceaccounts:<NAMESPACE>
     ```
-1. Log out of the cluster to exit from the `default` namespace:
+1. Switch to the namespace that you created:
     ```bash
-    cloudctl logout
+    cloudctl target -n <NAMESPACE>
     ```
-1. Log back into the cluster using the command from step 2 and 3. Then pick the namespace you had just created.
 1. You can now explore `kubectl` and `cloudctl` CLIs.
 1. Run the following commands to get familiar with these tools:
     1. `kubectl version`: Print the client and server version information.
