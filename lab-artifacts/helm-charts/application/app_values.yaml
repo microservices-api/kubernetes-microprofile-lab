@@ -4,10 +4,6 @@ image:
   pullPolicy: Always
   license: ""
 
-  extraEnvs:
-  - name: "isAppDown"
-    value: "false"
-
 ingress:
   enabled: true
   rewriteTarget: "/openapi/ui"
