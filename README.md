@@ -112,7 +112,7 @@ You can access your IBM Cloud Private cluster management console from a web brow
 
 1. Find out the master ip which we will use in the later steps:
     ```bash
-    cloud cm masters
+    cloudctl cm masters
     ```
     You should get an output similar to the following:
     ```bash
