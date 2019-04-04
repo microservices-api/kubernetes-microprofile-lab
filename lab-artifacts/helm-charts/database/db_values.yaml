@@ -1,0 +1,16 @@
+fullnameOverride: couchdb
+
+## clusterSize is the initial size of the CouchDB cluster.
+clusterSize: 1
+
+## To better tolerate Node failures, we can prevent Kubernetes scheduler from
+## assigning more than one Pod of CouchDB StatefulSet per Node using podAntiAffinity.
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: beta.kubernetes.io/arch
+          operator: In
+          values:
+          - amd64

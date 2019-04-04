@@ -1,0 +1,21 @@
+## Login to ICP registry
+docker login greyjoy.icp:8500
+
+## Build and push Enterprise Image
+docker build -t greyjoy.icp:8500/arthurdm/acmeair:enterpriseWeb -f EnterpriseDockerfile  .
+docker push greyjoy.icp:8500/arthurdm/acmeair:enterpriseWeb 
+
+## Build and push Application Image
+docker build -t greyjoy.icp:8500/arthurdm/microservice-vote:latest -f ApplicationDockerfile .
+docker push greyjoy.icp:8500/arthurdm/microservice-vote:latest
+
+# Login to ICP
+cloudctl login -a https://9.42.98.67:8443 --skip-ssl-validation
+
+## Deploy CouchDB
+helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+helm install incubator/couchdb -f db_values.yaml --tls
+
+## Deploy Liberty
+helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
+helm install ibm-charts/ibm-websphere-liberty -f app_values.yaml -f enterprise_values.yaml  --tls

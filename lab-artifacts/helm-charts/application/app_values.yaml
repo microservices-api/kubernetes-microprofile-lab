@@ -1,0 +1,18 @@
+image:
+  repository: greyjoy.icp:8500/arthurdm/microservice-vote
+  tag: latest
+  pullPolicy: Always
+  license: ""
+
+ingress:
+  enabled: true
+  rewriteTarget: "/openapi/ui"
+  path: "/docs"
+
+microprofile:
+  health:
+    enabled: true
+
+pod:
+  labels:
+    application: conference

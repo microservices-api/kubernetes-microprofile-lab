@@ -1,0 +1,34 @@
+image:
+  extraEnvs:
+  - name: "dbUrl"
+    value: "http://couchdb-svc-couchdb:5984"
+  - name: dbUsername
+    valueFrom:
+      secretKeyRef:
+        name: couchdb-couchdb
+        key: adminUsername
+  - name: dbPassword
+    valueFrom:
+      secretKeyRef:
+        name: couchdb-couchdb
+        key: adminPassword
+
+monitoring:
+  enabled: true
+
+resources:
+  constraints:
+    enabled: false
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+
+rbac:
+  install: true
+
+arch:
+  amd64: "3 - Most preferred"
+  ppc64le: "0 - Do not use"
+  s390x: "0 - Do not use"
