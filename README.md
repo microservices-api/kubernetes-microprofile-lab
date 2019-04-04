@@ -239,7 +239,7 @@ Now let's deploy our workload using Helm charts.
     ```bash
     cd ../application
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-websphere-liberty -f app_values.yaml -f enterprise_values.yaml  --tls
+    helm install ibm-charts/ibm-websphere-liberty -f app_overrides.yaml -f enterprise_overrides.yaml  --tls
     ```
 
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
