@@ -196,7 +196,7 @@ The following steps will build the sample application and create a Docker image 
     ```
     Replace `<NAMESPACE>` with your username. As an example:
     ```bash
-    docker build -t mycluster.icp:8500/userX/microservice-vote:1.0.0 .
+    docker build -t mycluster.icp:8500/userX/microservice-vote:1.0.0 -f ApplicationDockerfile .
     ```
 1. You can use the Docker CLI to verify that your image is built:
     ```bash
@@ -234,7 +234,7 @@ Now let's deploy our workload using Helm charts.
     helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
     helm install incubator/couchdb -f db_values.yaml --tls
     ```
-    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running.
+    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command)
 1. Deploy the microservice using the WebSphere Liberty Helm chart:
     ```bash
     cd ../application
