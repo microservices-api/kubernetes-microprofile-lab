@@ -140,7 +140,7 @@ You can clone the lab artifacts and explore the application:
     ```
 1. Navigate into the sample application directory:
     ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts
+    cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. See if you can find where technologies described below are used in the application.
 
@@ -170,37 +170,33 @@ You can clone the lab artifacts and explore the application:
 
 ## Dockerizing Vote Microservice
 
-By now you should have a general understanding about the applications. Now you will see how you can package the sample application into a Docker container.
+By now you should have a general understanding about the application. Now you will see how you can package the sample application into a Docker container by using a Dockerfile that contains instructions on how the image is built.
 
-The application is packaged as a Docker image, using a Dockerfile that contains instructions on how the image is built.
+In this lab we demonstrate a best-practice pattern which separates the concerns between the enterprise architect and the developer.  We first build a Docker image that will act as our `enterprise base image`, which in a company would be the shared curated image that all developers must start from - this allows for consistent and compliance across the enterprise.  We then build the developer's Docker image, which starts from the enterprise base image and adds only the application and related configuration.
 
-**Dockerfile**
-
-```docker
-FROM open-liberty:microProfile1
-COPY server.xml /config/server.xml
-COPY target/microservice-vote-1.0.0-SNAPSHOT.war /config/apps/vote.war
-```
-
-This Dockerfile describes that our container is built on top of `open-liberty:microProfile1` Docker image and includes our applications along with the server.xml needed to run the app.
-
-The following steps will build the sample application and create a docker image that includes the vote microservice:
+The following steps will build the sample application and create a Docker image that includes the vote microservice:
 
 1. Navigate into the sample application directory if you are not already:
     ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts
+    cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. Build the sample application:
     ```bash
     mvn clean package
     ```
-1. Build and tag the Docker image:
+1. Build and tag the Enterprise Docker image:
     ```bash
-    docker build -t mycluster.icp:8500/<NAMESPACE>/microservice-vote .
+    cd ..
+    docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
+    ```
+1. Build and tag the Application Docker image:
+    ```bash
+    cd ../docker
+    docker build -t mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
     Replace `<NAMESPACE>` with your username. As an example:
     ```bash
-    docker build -t mycluster.icp:8500/userX/microservice-vote .
+    docker build -t mycluster.icp:8500/userX/microservice-vote:1.0.0 -f ApplicationDockerfile .
     ```
 1. You can use the Docker CLI to verify that your image is built:
     ```bash
@@ -217,7 +213,7 @@ We will use IBM Cloud Private's internal Docker registry to host our image.  Thi
     ```
 1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP Docker registry:
     ```bash
-    docker push mycluster.icp:8500/<NAMESPACE>/microservice-vote
+    docker push mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0
     ```
 1. Your image is now available in the Docker registry in ICP. You can verify this through the management console: `Console -> Container Images`.
 
@@ -229,26 +225,23 @@ You can use ICP Dashboard to deploy Helm charts into your Kubernetes cluster thr
 
 First, let's see what are **Helm charts**. Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
 
-Now let's deploy our workload using Helm charts:
+Now let's deploy our workload using Helm charts.
 
-1. Deploy the microservice using Helm:
+## Deploy CouchDB
+1. Deploy the CouchDBHhelm chart:
     ```bash
-    helm install --tls --name=vote-<USERNAME> --namespace=<NAMESPACE> helm-chart/microservice-vote --set ibm-websphere-liberty.image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote 
+    cd helm/database
+    helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+    helm install incubator/couchdb -f db_values.yaml --tls
     ```
-    Note: create a unique username to distinguish your application from others, it is valid to have the same value for USERNAME and NAMESPACE.
-1. Run the following command to see the state of deployments:
+    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command)
+1. Deploy the microservice using the WebSphere Liberty Helm chart:
     ```bash
-    kubectl get deployments,statefulsets
+    cd ../application
+    helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
+    helm install ibm-charts/ibm-websphere-liberty -f app_overrides.yaml -f enterprise_overrides.yaml  --tls
     ```
-    You should get an output similar to the following:
-    ```bash
-    NAME                                             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-    deployment.extensions/vote-userx-ibm-websphere   1         1         1            1           45s
 
-    NAME                               DESIRED   CURRENT   AGE
-    statefulset.apps/couchdb-couchdb   1         1         45s
-    ```
-    You might need to wait until the database deployment is available, indicated by `1` in the *AVAILABLE* column.
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
 1. Select the namespace that belongs to you.
