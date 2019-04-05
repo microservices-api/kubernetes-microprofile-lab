@@ -1,6 +1,6 @@
 image:
-  repository: greyjoy.icp:8500/arthurdm/microservice-vote
-  tag: latest
+  repository: greyjoy.icp:8500/ademagalhaes/microservice-vote
+  tag: 1.0.0
   pullPolicy: Always
   license: ""
 
