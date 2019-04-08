@@ -1,4 +1,6 @@
 
+*This page is currently outdated.  Under constructions.*
+
 ## Step 1: Configure minikube
 
 1. Start minikube by running `minikube start`
