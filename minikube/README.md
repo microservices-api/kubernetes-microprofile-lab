@@ -1,5 +1,5 @@
 
-*This page is currently outdated.  Under constructions.*
+**This page is currently outdated.  Under construction.**
 
 ## Step 1: Configure minikube
 
