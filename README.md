@@ -235,6 +235,8 @@ Now let's deploy our workload using Helm charts.
     helm install incubator/couchdb -f db_values.yaml --tls
     ```
     Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command)
+    
+## Deploy Liberty    
 1. Deploy the microservice using the WebSphere Liberty Helm chart:
     ```bash
     cd ../application
