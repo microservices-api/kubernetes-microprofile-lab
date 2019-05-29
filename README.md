@@ -311,18 +311,14 @@ The steps below would guide you how to enable persistence for your database:
     ```
     Again, you need to wait until the couchdb pod is ready. Wait until the value under `READY` column becomes `2/2`. 
 
-1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it return 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
-1. Navigate into the sample application directory if you have not already:
-    ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts
-    ```
+1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it returns 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
 1. Now let's enable persistence for our database:
     ```bash
     helm upgrade --tls --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
     ```
 1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
     ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set replicaCount=2 ibm-charts/ibm-websphere-liberty vote-<NAMESPACE>
+    helm upgrade --tls --recreate-pods --force --reuse-values --set replicaCount=2 vote-<NAMESPACE> ibm-charts/ibm-websphere-liberty
     ```
 1. List the deployed packages with their chart versions by running:
     ```bash
@@ -333,8 +329,10 @@ The steps below would guide you how to enable persistence for your database:
     ```bash
     kubectl get pods
     ```
-    You need to wait until the deployments are ready.
-1. Refresh the page. If you get `Failed to load API defintion` message then try refreshing again. You may need to add the security exception again.
+    You need to wait until the couchdb and Liberty pods become ready. The old pods may be terminating while the new ones start up.
+
+    For Liberty, you will now see 2 pods, since we increased the number of replicas.
+1. Refresh the page. You may need to add the security exception again. If you get `Failed to load API defintion` message then try refreshing again. 
 1. Now add a new attendee through the OpenAPI UI as before.
 1. Now repeat Steps 1-5 in this section to see that even though you delete the couchdb database container, data still gets recovered from the PersistentVolume.
 
