@@ -1,12 +1,12 @@
 ![Overview](images/arch_diagram_new.png)
 
-# MicroProfile Lab with IBM Cloud Private and Open Liberty
+# MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
 
-This lab illustrates steps to deploy a MicroProfile application, running in a Open Liberty Docker container, into a Kubernetes environment, such as [IBM Cloud Private](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploying-a-microprofile-application-in-an-ibm-cloud-private-cluster-icp), and [minikube (bonus)](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/minikube).
+This lab illustrates steps to deploy a MicroProfile application, running in a WebSphere Liberty Docker container, into a Kubernetes environment, such as [IBM Cloud Private](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploying-a-microprofile-application-in-an-ibm-cloud-private-cluster-icp), and [minikube (bonus)](https://github.com/microservices-api/kubernetes-microprofile-lab/tree/master/minikube).
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
-For questions/comments about Open Liberty's Docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
+For questions/comments about Liberty's Docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
 
 # Before you begin
 
@@ -36,7 +36,7 @@ This lab has been tested on Mac OSX (High Sierra), Ubuntu 16.04 and Windows 10, 
 
 # Deploying a MicroProfile application in an IBM Cloud Private cluster (ICP)
 
-This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
+This part of the lab will walk you through the deployment of our sample MicroProfile Application into an IBM Cloud Private cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a WebSphere Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
 ## Prerequisites
 
@@ -191,10 +191,9 @@ The following steps will build the sample application and create a Docker image 
     ```
 1. Build and tag the Application Docker image:
     ```bash
-    cd ../docker
     docker build -t mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
-    Replace `<NAMESPACE>` with your username. As an example:
+    In above command (as well as in all subsequent commands), replace `<NAMESPACE>` with the unique namespace you created earlier. As an example:
     ```bash
     docker build -t mycluster.icp:8500/userX/microservice-vote:1.0.0 -f ApplicationDockerfile .
     ```
@@ -219,7 +218,7 @@ We will use IBM Cloud Private's internal Docker registry to host our image.  Thi
 
     ![Images Repository](images/images_repo.png)
 
-# Part 2: Deploy Open Liberty and CouchDB Helm charts
+# Part 2: Deploy Liberty and CouchDB Helm charts
 
 You can use ICP Dashboard to deploy Helm charts into your Kubernetes cluster through the Catalog page. In addition, you can use Helm command line tool to install a Helm chart which we will do in this part of the lab.
 
@@ -228,41 +227,43 @@ First, let's see what are **Helm charts**. Helm is a package manager for Kuberne
 Now let's deploy our workload using Helm charts.
 
 ## Deploy CouchDB
-1. Deploy the CouchDBHhelm chart:
+1. Deploy the CouchDB Helm chart:
     ```bash
     cd helm/database
     helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-    helm install incubator/couchdb -f db_values.yaml --tls
+    helm install incubator/couchdb -f db_values.yaml --name couchdb --tls
     ```
-    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command)
+    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command).
+
+    You need to wait until the pods are ready.
     
 ## Deploy Liberty    
 1. Deploy the microservice using the WebSphere Liberty Helm chart:
     ```bash
     cd ../application
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-websphere-liberty -f app_overrides.yaml -f enterprise_overrides.yaml  --tls
+    helm install ibm-charts/ibm-websphere-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> --tls
     ```
 
 1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
 1. Click on the Namespace menu on the top right of the page.
 1. Select the namespace that belongs to you.
-1. You should see a deployment `vote-<USERNAME>-ibm-websphere`.
+1. You should see a deployment `vote-<NAMESPACE>-ibm-websphere`.
 1. Similarly, you will see `couchdb-couchdb` when you go into `Workloads -> Statefulsets` under your namespace.
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
 1. Click on your Helm release name. You can use the search box to find it.
 1. Release page shows all the Kubernetes resources created on the cluster.
 1. See that there are four resources created under **Service**.
-1. Click on `vote-<USERNAME>-ibm-websphere`. This would take you to another page.
+1. Click on `vote-<NAMESPACE>-ibm-websphere`. This would take you to another page.
 1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
-1. You should see the Open Liberty Welcome Page.
+1. You should see the Liberty Welcome Page.
 1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
 
 # Part 3: Explore the application
 
-The `vote` application is using various MicroProfile specifications.  The `/openapi` endpoint of the application exposes the [MicroProfile OpenAPI](http://download.eclipse.org/microprofile/microprofile-open-api-1.0.1/microprofile-openapi-spec.html) specification.  The `/openapi/ui` endpoint is a value-add from [Open Liberty](https://openliberty.io/).  This UI allows developers and API consumers to invoke the API right from the browser!
+The `vote` application is using various MicroProfile specifications.  The `/openapi` endpoint of the application exposes the [MicroProfile OpenAPI](http://download.eclipse.org/microprofile/microprofile-open-api-1.0.1/microprofile-openapi-spec.html) specification.  The `/openapi/ui` endpoint is a value-add from Liberty.  This UI allows developers and API consumers to invoke the API right from the browser!
 
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
 1. Place your username (e.g. userX) in the `id` field, and place your name in the `name` field.
@@ -270,7 +271,7 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  This entry has now been saved into the CouchDB database that our microservice is using.
     ![image](images/post_result.png)
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and type into the textbox the `id` you entered from the previous step.
-1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our Open Liberty microservice into the CouchDB database.
+1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our microservice into the CouchDB database.
 1. Feel free to explore the other APIs and play around with the microservice!
 
 # Part 4: Update the Helm release
@@ -279,7 +280,7 @@ In this part of the lab you will practice how to make changes to the Helm releas
 
 So far, the database you deployed stores the data inside the container running the database. This means if the container gets deleted or restarted for any reason, all the data stored in the database would be lost.
 
-In order to store the data outside of the database container, you would need to enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by a automatic provisioner.
+In order to store the data outside of the database container, you would need to enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by an automatic provisioner.
 
 The steps below would guide you how to enable persistence for your database:
 
@@ -303,7 +304,7 @@ The steps below would guide you how to enable persistence for your database:
     couchdb-couchdb-0                           2/2     Running   0          3m
     vote-userx-ibm-websphere-5b44d988bd-kqrjn   1/1     Running   0          3m
     ```
-    You might need to wait until the database deployment is available.
+    You need to wait until the database deployment is available.
 1. Call the `GET /attendee` endpoint from the OpenAPI UI page and see that the server does not return any attendee from the database.
 1. Navigate into the sample application directory if you are not already:
     ```bash
@@ -311,13 +312,13 @@ The steps below would guide you how to enable persistence for your database:
     ```
 1. Now let's enable persistence for our database:
     ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set couchdb.persistentVolume.enabled=true --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote vote-<USERNAME> helm-chart/microservice-vote
+    helm upgrade --tls --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
     ```
 1. List the deployed packages with their chart versions by running:
     ```bash
     helm ls --namespace <NAMESPACE> --tls
     ```
-    You can see that the number of revisions should be 2 now.
+    You can see that the number of revisions should be 2 now for couchdb.
 1. Run the following command to see the state of deployments:
     ```bash
     kubectl get pods --namespace <NAMESPACE>
@@ -332,7 +333,7 @@ Congratulations! You finished the lab! You got to use a few powerful tools to in
 
 ## Shared Cluster
 
-Here are some details about the shared cluster used during CASCON 2018 workshop:
+Here are some details about the shared cluster used during workshop:
 
 * IBM Cloud Private 3.1.1 is installed on the cluster
 * The cluster has one master node and six worker node.
@@ -347,9 +348,3 @@ Here are some details about the shared cluster used during CASCON 2018 workshop:
 ## Stay in sync
 
 Join the ICP [technical community](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/W1559b1be149d_43b0_881e_9783f38faaff) to stay up to date with news related to IBM Cloud Private.
-
-# [Bonus: Deploying a MicroProfile application in a minikube cluster](minikube/README.md)
-
- In the bonus/take-home section you'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a helm chart that deploys the Liberty container into a Kubernetes cluster (minikube), with the appropriate ingress and service setup, while also deploying and configuring a Couchdb Helm chart that stands up the database that holds the data for this microservice.  
-
- We will walk you through the deployment of our sample MicroProfile Application into a minikube. You'll notice that we're using the exact same artifacts (Helm charts & Docker containers) as the steps for ICP. However, minikube is the simplest way for a developer to get a Kubernetes cluster up and running locally in their laptop.
