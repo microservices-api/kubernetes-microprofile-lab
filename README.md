@@ -40,9 +40,10 @@ This part of the lab will walk you through the deployment of our sample MicroPro
 
 ## Prerequisites
 
-1. The user's namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run
+1. The user's namespace pod security policy must be no more restrictive than `ibm-anyuid-psp` or CouchDB will not run. We have instructions to configure the namespace you'll create later in the lab.
     1. https://github.com/IBM/cloud-pak/tree/master/spec/security/psp
-1. A ClusterImagePolicy must exist that allows the following registry URLs
+
+1. A ClusterImagePolicy must exist that allows the following registry URLs. This is already done on the cluster you're provided for the workshop.
     1. `docker.io/kocolosk/couchdb-statefulset-assembler:*`
     1. `docker.io/couchdb*`
 
@@ -63,8 +64,8 @@ To access your cluster using these tools, you need to log in to your cluster. On
     cloudctl login -a https://mycluster.icp:8443 -c id-mycluster-account --skip-ssl-validation
     ```
     Your machine is setup to resolve `mycluster.icp` into the ip address of the master node of a shared ICP cluster.
-1. Enter the credentials: admin/admin
-1. Select the `default` namespace when prompted. 
+1. Enter the credentials. Username is `admin` and password is `admin`
+1. Select the `default` namespace when prompted by entering the number next to the namespace.
 1. Once you are successfully logged in, you should see the following message:
     ```bash
     Configuring kubectl ...
@@ -214,7 +215,7 @@ We will use IBM Cloud Private's internal Docker registry to host our image.  Thi
     ```bash
     docker push mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0
     ```
-1. Your image is now available in the Docker registry in ICP. You can verify this through the management console: `Console -> Container Images`.
+1. Your image is now available in the Docker registry in ICP. You can verify this through the management console: `Console -> Container Images`. Search for `microservice-vote`
 
     ![Images Repository](images/images_repo.png)
 
@@ -233,10 +234,14 @@ Now let's deploy our workload using Helm charts.
     helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
     helm install incubator/couchdb -f db_values.yaml --name couchdb --tls
     ```
-    Follow the instructions from the helm deployment to ensure the CouchDB Pods are up and running (Only the `kubectl get pods ...` command, don't worry about the `kubectl exec ...` command).
-
-    You need to wait until the pods are ready.
+    Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
+     ```bash
+    NAME                                        READY   STATUS    RESTARTS   AGE
+    couchdb-couchdb-0                           2/2     Running   0          3m
+    ```
     
+    You need to wait until the value under `READY` column becomes `2/2`. Re-run the `kubectl get pods` command if necessary.
+
 ## Deploy Liberty    
 1. Deploy the microservice using the WebSphere Liberty Helm chart:
     ```bash
@@ -252,13 +257,13 @@ Now let's deploy our workload using Helm charts.
 1. Similarly, you will see `couchdb-couchdb` when you go into `Workloads -> Statefulsets` under your namespace.
 1. Feel free to click on any of the deployments and see details about each deployments.
 1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
-1. Click on your Helm release name. You can use the search box to find it.
+1. Click on your Helm release name. You can use the search box to find it by entering `vote-<NAMESPACE>`
 1. Release page shows all the Kubernetes resources created on the cluster.
 1. See that there are four resources created under **Service**.
 1. Click on `vote-<NAMESPACE>-ibm-websphere`. This would take you to another page.
-1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error.
+1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error. On FireFox, click on `Advanced -> Add Exception... -> Confirm Security Exception`
 1. You should see the Liberty Welcome Page.
-1. Add `/openapi/ui` to the URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
+1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
 
 # Part 3: Explore the application
@@ -287,16 +292,16 @@ The steps below would guide you how to enable persistence for your database:
 1. In [Part 3](#Part-3-Explore-the-application), you would've observed that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
 1. Find the name of the pod that is running the database container:
     ```bash
-    kubectl get pods --namespace <NAMESPACE>
+    kubectl get pods
     ```
     You should see a pod name similar to `couchdb-couchdb-0`.
-1. Delete the CouchDB pod to delete the container running the database. Replace `<POD_NAME>` with the pod name from the previous step:
+1. Delete the CouchDB pod to delete the container running the database.
     ```bash
-    kubectl delete pod <POD_NAME> --namespace <NAMESPACE>
+    kubectl delete pod couchdb-couchdb-0
     ```
 1. Run the following command to see the state of deployments:
     ```bash
-    kubectl get pods --namespace <NAMESPACE>
+    kubectl get pods
     ```
     You should get an output similar to the following:
     ```bash
@@ -304,9 +309,10 @@ The steps below would guide you how to enable persistence for your database:
     couchdb-couchdb-0                           2/2     Running   0          3m
     vote-userx-ibm-websphere-5b44d988bd-kqrjn   1/1     Running   0          3m
     ```
-    You need to wait until the database deployment is available.
-1. Call the `GET /attendee` endpoint from the OpenAPI UI page and see that the server does not return any attendee from the database.
-1. Navigate into the sample application directory if you are not already:
+    Again, you need to wait until the couchdb pod is ready. Wait until the value under `READY` column becomes `2/2`. 
+
+1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it return 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
+1. Navigate into the sample application directory if you have not already:
     ```bash
     cd kubernetes-microprofile-lab/lab-artifacts
     ```
@@ -314,18 +320,23 @@ The steps below would guide you how to enable persistence for your database:
     ```bash
     helm upgrade --tls --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
     ```
+1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
+    ```bash
+    helm upgrade --tls --recreate-pods --force --reuse-values --set replicaCount=2 ibm-charts/ibm-websphere-liberty vote-<NAMESPACE>
+    ```
 1. List the deployed packages with their chart versions by running:
     ```bash
     helm ls --namespace <NAMESPACE> --tls
     ```
-    You can see that the number of revisions should be 2 now for couchdb.
+    You can see that the number of revision should be 2 now for couchdb and Liberty.
 1. Run the following command to see the state of deployments:
     ```bash
-    kubectl get pods --namespace <NAMESPACE>
+    kubectl get pods
     ```
     You need to wait until the deployments are ready.
-1. Refresh the site, then add a new attendee through the OpenAPI UI.
-1. Now repeat Steps 1-5 in this section to see that even though you delete the database container, data still gets recovered from the PersistentVolume.
+1. Refresh the page. If you get `Failed to load API defintion` message then try refreshing again. You may need to add the security exception again.
+1. Now add a new attendee through the OpenAPI UI as before.
+1. Now repeat Steps 1-5 in this section to see that even though you delete the couchdb database container, data still gets recovered from the PersistentVolume.
 
 In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
 
