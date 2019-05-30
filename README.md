@@ -135,7 +135,7 @@ The vote microservice stores feedback from the sessions and displays how well al
 
 You can clone the lab artifacts and explore the application:
 
-1. Clone the project into your machine:
+1. Clone the project into your machine. This is already done on the laptop provided for you in this workshop, so you can skip this step. The cloned folder is under the Home directory (shortcut is on the desktop).
     ```bash
     git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
     ```
