@@ -1,3 +1,6 @@
+
+**Under constructions**  This lab is being re-worked to run on Minishift
+
 ![Overview](images/arch_diagram_new.png)
 
 # MicroProfile Lab with IBM Cloud Private and WebSphere Liberty
