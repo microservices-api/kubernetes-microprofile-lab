@@ -208,11 +208,11 @@ The steps below would guide you how to enable persistence for your database:
     ```
 1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
     ```bash
-    helm upgrade  --recreate-pods --force --reuse-values --set replicaCount=2 vote-<NAMESPACE> ibm-charts/ibm-open-liberty
+    helm upgrade  --recreate-pods --force --reuse-values --set replicaCount=2 <release_name> ibm-charts/ibm-open-liberty
     ```
 1. List the deployed packages with their chart versions by running:
     ```bash
-    helm ls --namespace <NAMESPACE> 
+    helm ls
     ```
     You can see that the number of revision should be 2 now for couchdb and Liberty.
 1. Run the following command to see the state of deployments:
