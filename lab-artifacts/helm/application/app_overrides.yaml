@@ -6,8 +6,8 @@ image:
 
 ingress:
   enabled: true
-  rewriteTarget: "/openapi/ui"
-  path: "/openapi/ui"
+  rewriteTarget: "/"
+  path: "/"
 
 microprofile:
   health:
