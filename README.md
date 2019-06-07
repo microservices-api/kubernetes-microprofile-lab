@@ -42,7 +42,7 @@ This lab will walk you through the deployment of our sample MicroProfile Applica
 
 1. Download and setup minikube
 1. Start minikube by running `minikube start`
-1. Enable ingress with the command `minikube addons enable ingress`
+1. Enable ingress with the command `minikube addons enable ingress`.  
 1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
 1. Set up helm and tiller by running `helm init`
 1. Wait until the following command indicates that the tiller-deploy deployment is available: `kubectl get deployment tiller-deploy --namespace kube-system`   (Note: This could take a few minutes)
