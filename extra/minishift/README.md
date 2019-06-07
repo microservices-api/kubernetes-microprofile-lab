@@ -1,15 +1,15 @@
 
-**Under constructions**  This lab is being re-worked to run on Minikube
+**Under constructions**  This lab is being re-worked to run on Minishift
 
-![Overview](images/diagram_general.png)
+![Overview](images/arch_diagram_new.png)
 
-# MicroProfile Lab with Open Liberty and Minikube
+# MicroProfile Lab with Open Liberty and Minishift
 
-This lab illustrates steps to deploy a MicroProfile application, running in a Open Liberty Docker container into [Minikube](https://kubernetes.io/docs/setup/minikube/)
+This lab illustrates steps to deploy a MicroProfile application, running in a Open Liberty Docker container into [MiniShift](https://docs.okd.io/latest/minishift/getting-started/index.html)
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
-For questions/comments about Liberty's Docker container or Helm charts please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
+For questions/comments about Liberty's Docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
 
 # Before you begin
 
@@ -20,9 +20,7 @@ git --help
 mvn --help
 java -help
 docker --help
-kubectl --help
 helm --help
-minikube --help
 ```
 
 If any of these is not installed:
@@ -31,23 +29,18 @@ If any of these is not installed:
 * Install [Maven](https://maven.apache.org/download.cgi)
 * Install [Docker engine](https://docs.docker.com/engine/installation/)
 * Install [Java 8](https://java.com/en/download/)
-* Install [kubectl](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.0/manage_cluster/cfc_cli.html)
 * Install [helm](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.0/app_center/create_helm_cli.html)
-* Install [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 
 
-# Deploying a MicroProfile application in a Minikube cluster
+# Deploying a MicroProfile application in a Minishift cluster
 
-This lab will walk you through the deployment of our sample MicroProfile Application into a Minikube cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
+This lab will walk you through the deployment of our sample MicroProfile Application into a Minishift cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
-## Setting up minikube
+## Installing Minishift
 
-1. Download and setup minikube
-1. Start minikube by running `minikube start`
-1. Enable ingress with the command `minikube addons enable ingress`
-1. Set the Docker CLI to target the minikube Docker engine by running `eval $(minikube docker-env)`
-1. Set up helm and tiller by running `helm init`
-1. Wait until the following command indicates that the tiller-deploy deployment is available: `kubectl get deployment tiller-deploy --namespace kube-system`   (Note: This could take a few minutes)
+Follow [these instructions](https://docs.okd.io/latest/minishift/getting-started/installing.html) to install and setup minishift in your machine.
+
+After successfully installing Minishift, follow the [getting started](https://docs.okd.io/latest/minishift/getting-started/quickstart.html) instructions to get this cluster up and running!  In particular, pay attention to the step that sets up the `minishift oc-env`.  
 
 ## Part 1A: Build the application and Docker container
 
@@ -116,11 +109,37 @@ The following steps will build the sample application and create a Docker image 
     ```bash
     docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
-1. You can use the Docker CLI to verify that your image is built.  Remember that this is querying Minikube's internal Docker registry.
+1. You can use the Docker CLI to verify that your image is built:
     ```bash
     docker images
     ```
 
+## Part 1B: Upload the Docker image to Minishift's registry
+
+We will use Minishift's internal Docker registry to host our image. 
+
+1. Ensure your `oc` client is logged into Minishift as `developer`.  To do this,  open the console and click on the top right corner to obtain the `oc login` command, which contains a token.  For example:
+```bash
+oc login https://192.198.78.10:8443 --token=k8WEA-ut2qBdpUN35mxYxNxkhmM6953GohIA7_7L1RE
+```
+
+** image goes here **
+
+1. Create a new project in Minishift which will host our application
+```bash
+oc new-project myproject
+```
+1. Log into the Docker registry
+```bash
+docker login -u developer -p $(oc whoami -t) $(minishift openshift registry)
+```
+1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP Docker registry:
+    ```bash
+    docker push mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0
+    ```
+1. Your image is now available in the Docker registry in ICP. You can verify this through the management console: `Console -> Container Images`. Search for `microservice-vote`
+
+    ![Images Repository](images/images_repo.png)
 
 ## Part 2: Deploy Liberty and CouchDB Helm charts
 
@@ -152,8 +171,20 @@ Now let's deploy our workload using Helm charts.
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
     helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> --tls
     ```
-1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until the `microservice-vote-deployment`deployment is available.
-1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
+
+1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
+1. Click on the Namespace menu on the top right of the page.
+1. Select the namespace that belongs to you.
+1. You should see a deployment `vote-<NAMESPACE>-ibm-open`.
+1. Similarly, you will see `couchdb-couchdb` when you go into `Workloads -> Statefulsets` under your namespace.
+1. Feel free to click on any of the deployments and see details about each deployments.
+1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
+1. Click on your Helm release name. You can use the search box to find it by entering `vote-<NAMESPACE>`
+1. Release page shows all the Kubernetes resources created on the cluster.
+1. See that there are four resources created under **Service**.
+1. Click on `vote-<NAMESPACE>-ibm-open`. This would take you to another page.
+1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error. On FireFox, click on `Advanced -> Add Exception... -> Confirm Security Exception`
+1. You should see the Liberty Welcome Page.
 1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
 
