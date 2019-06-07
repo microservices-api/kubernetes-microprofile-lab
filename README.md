@@ -133,7 +133,7 @@ Now let's deploy our workload using Helm charts.
     ```bash
     cd helm/database
     helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-    helm install incubator/couchdb -f db_values.yaml --name couchdb --tls
+    helm install incubator/couchdb -f db_values.yaml --name couchdb 
     ```
     Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
      ```bash
@@ -148,11 +148,12 @@ Now let's deploy our workload using Helm charts.
     ```bash
     cd ../application
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> --tls
+    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> 
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until the `microservice-vote-deployment`deployment is available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
 1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
+1. If you find that your minikube ingress is taking too long to return the result of the invocation and you get a timeout error, you can bypass the ingress and reach the application via its NodePort layer.  To do that, simply find the NodePort port by running the command `kubectl describe service microservice-vote-service | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://192.168.99.100:30698/openapi/ui/`.  If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate. 
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
 
 ## Part 3: Explore the application
@@ -203,15 +204,15 @@ The steps below would guide you how to enable persistence for your database:
 1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it returns 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
 1. Now let's enable persistence for our database:
     ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
+    helm upgrade  --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
     ```
 1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
     ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set replicaCount=2 vote-<NAMESPACE> ibm-charts/ibm-open-liberty
+    helm upgrade  --recreate-pods --force --reuse-values --set replicaCount=2 vote-<NAMESPACE> ibm-charts/ibm-open-liberty
     ```
 1. List the deployed packages with their chart versions by running:
     ```bash
-    helm ls --namespace <NAMESPACE> --tls
+    helm ls --namespace <NAMESPACE> 
     ```
     You can see that the number of revision should be 2 now for couchdb and Liberty.
 1. Run the following command to see the state of deployments:
