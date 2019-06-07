@@ -148,7 +148,7 @@ Now let's deploy our workload using Helm charts.
     ```bash
     cd ../application
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=microservice-vote 
+    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until the `microservice-vote-deployment`deployment is available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
