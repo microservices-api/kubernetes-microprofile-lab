@@ -1,6 +1,4 @@
 
-**Under constructions**  This lab is being re-worked to run on Minikube
-
 ![Overview](images/diagram_general.png)
 
 # MicroProfile Lab with Open Liberty and Minikube
@@ -40,7 +38,7 @@ If any of these is not installed:
 
 This lab will walk you through the deployment of our sample MicroProfile Application into a Minikube cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
-## Setting up minikube
+## Setting up the cluster
 
 1. Download and setup minikube
 1. Start minikube by running `minikube start`
