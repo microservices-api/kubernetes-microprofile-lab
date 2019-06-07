@@ -36,7 +36,7 @@ If any of these is not installed:
 
 # Deploying a MicroProfile application in a Minikube cluster
 
-This lab will walk you through the deployment of our sample MicroProfile Application into a Minikube cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
+This lab will walk you through the deployment of our sample MicroProfile Application into a Minikube cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container to Minikube, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
 ## Setting up the cluster
 
@@ -122,7 +122,7 @@ The following steps will build the sample application and create a Docker image 
 
 ## Part 2: Deploy Liberty and CouchDB Helm charts
 
-You can use ICP Dashboard to deploy Helm charts into your Kubernetes cluster through the Catalog page. In addition, you can use Helm command line tool to install a Helm chart which we will do in this part of the lab.
+In this part of the lab you will use the Helm command line tool to install a Helm chart.
 
 First, let's see what are **Helm charts**. Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
 
@@ -148,7 +148,7 @@ Now let's deploy our workload using Helm charts.
     ```bash
     cd ../application
     helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> 
+    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=microservice-vote 
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`.  You want to wait until the `microservice-vote-deployment`deployment is available.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
