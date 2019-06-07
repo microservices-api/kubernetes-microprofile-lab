@@ -2,12 +2,10 @@ FROM openliberty/open-liberty:microProfile2-ubi-min
 
 # Enterprise QoS
 #COPY --from=hazelcast/hazelcast --chown=1001:0 /opt/hazelcast/lib/*.jar /opt/ibm/wlp/usr/shared/resources/hazelcast/
-#ARG HZ_SESSION_CACHE=client
-#ARG OIDC_CLIENT=true
-ARG MP_MONITORING=true
-ARG SSL=true
+#ENV HZ_SESSION_CACHE=client
+#ENV OIDC_CLIENT=true
+ENV MP_MONITORING=true
+ENV SSL=true
 
 # Enterprise base features and server config
 # COPY --chown=1001:0 enterpriseServer.xml /config/configDropins/overrides/enterpriseServer.xml
-
-RUN configure.sh
