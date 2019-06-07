@@ -1,13 +1,13 @@
 image:
   repository: microservice-vote
   tag: 1.0.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   license: ""
 
 ingress:
   enabled: true
   rewriteTarget: "/openapi/ui"
-  path: "/docs"
+  path: "/openapi/ui"
 
 microprofile:
   health:
