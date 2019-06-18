@@ -1,0 +1,40 @@
+apiVersion: openliberty.io/v1alpha1
+kind: OpenLiberty
+metadata:
+  name: operator-demo-openliberty
+spec:
+  image:
+    # repository: quay.io/arthurdm/microservice-vote
+    repository: microservice-vote
+    tag: 1.0.0
+    pullPolicy: IfNotPresent
+    license: ""
+    extraEnvs:
+    - name: "dbUrl"
+      value: "http://couchdb-svc-couchdb:5984"
+    - name: dbUsername
+      valueFrom:
+        secretKeyRef:
+          name: couchdb-couchdb
+          key: adminUsername
+    - name: dbPassword
+      valueFrom:
+        secretKeyRef:
+          name: couchdb-couchdb
+          key: adminPassword
+  ingress:
+    enabled: true
+    rewriteTarget: "/"
+    path: "/"
+  microprofile:
+    health:
+      enabled: true
+  pod:
+    labels:
+      application: conference
+  monitoring:
+    enabled: true
+  arch:
+    amd64: "3 - Most preferred"
+    ppc64le: "0 - Do not use"
+    s390x: "0 - Do not use"
