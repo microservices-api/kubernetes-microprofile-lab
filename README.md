@@ -31,23 +31,27 @@ If any of these are not installed:
 * Install [kubectl](https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz)
 * Install [oc](https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz)
 
-## What is OKD?
+## What is **OKD**?
 
 From [okd.io](https://www.okd.io):
 >OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift. OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10. If you are looking for enterprise-level support, or information on partner certification, Red Hat also offers Red Hat OpenShift Container Platform.
 
-## What are Operators?
+## What are **Operators**?
 
 From [Red Hat](https://www.redhat.com/en/blog/introducing-operator-framework-building-apps-kubernetes):
 > An Operator is a method of packaging, deploying and managing a Kubernetes application. A Kubernetes application is an application that is both deployed on Kubernetes and managed using the Kubernetes APIs and kubectl tooling. To be able to make the most of Kubernetes, you need a set of cohesive APIs to extend in order to service and manage your applications that run on Kubernetes. You can think of Operators as the runtime that manages this type of application on Kubernetes.
 
+## What are **Helm charts**?
+
+Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
+
 # Deploying a MicroProfile application in an OKD cluster
 
-This lab will walk you through the deployment of our sample MicroProfile Application into an OKD cluster. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize an operator that deploys an Open Liberty container to OKD, with the appropriate service setup, while also deploying and configuring a CouchDB operator that stands up the a database that holds data for this microservice.
+This lab will walk you through the deployment of our sample MicroProfile application into an OKD cluster. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize an operator that deploys an Open Liberty container to OKD, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the a database that holds data for this microservice.
 
 ## Setting up the cluster
 
-To install OKD on RHEL or CentOS, follow instructions describe [here](https://github.com/gshipley/installcentos#installation). Ensure SELinux is set to _permissive_.
+To setup a VM in vLaunch and install OKD, see [instructions here](https://apps.na.collabserv.com/wikis/home?lang=en-us#!/wiki/Wfe97e7c353a2_4510_8471_7148220c0bec/page/Setting%20up%20a%20vLaunch%20System%20for%20Red%20Hat%20OpenShift%20Lab). If you do not have access to IBM's vLaunch, follow [instructions here](https://github.com/gshipley/installcentos).
 
 ## Part 1A: Build the application and Docker container
 
@@ -127,37 +131,33 @@ The following steps will build the sample application and create a Docker image 
 
 ## Part 1B: Upload the Docker image to OKD's internal registry
 
-We will use OKD's internal Docker registry to host our image.
+OKD provides an internal, integrated container image registry. For this lab, we will use this registry to host our application image.
 
-1. Ensure your `oc` client is logged into OKD. Replace `<USERNAME>`, `<PASSWORD>` and `<CLUSTER_IP>` with appropriate values:
+1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```bash
-    oc login --username=<USERNAME> --password=<PASSWORD> https://console.<CLUSTER_IP>.nip.io:8443
+    oc login --username=<username> --password=<password>
     ```
-1. Create a new project in OKD which will host our application:
+1. Create a new project to host our application:
     ```bash
     oc new-project myproject
     ```
-1. Log into the Docker registry:
+1. Log into the internal registry:
     ```bash
-    docker login -u $(oc whoami) -p $(oc whoami -t) docker-registry-default.apps.<CLUSTER_IP>.nip.io
+    oc registry login --skip-check
     ```
-1. Tag the Docker image:
+1. Tag your Docker image:
     ```bash
-    docker tag microservice-vote:1.0.0 docker-registry-default.apps.<CLUSTER_IP>.nip.io/microservice-vote:1.0.0
+    docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
-1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP Docker registry:
+1. Now your tagged image into the registry:
     ```bash
-    docker push docker-registry-default.apps.<CLUSTER_IP>.nip.io/microservice-vote:1.0.0
+    docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
-1. Your image is now available in the Docker registry in OKD. You can verify this through the OKD's Registry Dashboard at `https://registry-console-default.apps.<CLUSTER_IP>.nip.io/registry`.
+1. Your image is now available in the Docker registry in OKD. You can verify this through the OKD's Registry Dashboard at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
 
-## Part 2: Deploy Liberty and CouchDB Operators
+## Part 2: Deploy Open Liberty operator and and CouchDB Helm chart
 
-In this part of the lab you will use the Helm command line tool to install a Helm chart.
-
-First, let's see what are **Helm charts**. Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
-
-Now let's deploy our workload using Helm charts.
+In this part of the lab you will install an operator and a Helm chart.
 
 ### Deploy CouchDB
 
@@ -253,8 +253,8 @@ Now that the Helm is configured locally and on OKD, you can deploy CouchDB Helm 
 1. You can view the status of your deployment by running `kubectl get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `kubectl get pods` and then fetch the logs of the Liberty pod with `kubectl logs <pod>`.
 1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
 1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
-1. If you find that your minikube ingress is taking too long to return the result of the invocation and you get a timeout error, you can bypass the ingress and reach the application via its NodePort layer.  To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://192.168.99.100:30698/openapi/ui/`.  If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate. 
-1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
+1. If you find that your OKD ingress is taking too long to return the result of the invocation and you get a timeout error, you can bypass the ingress and reach the application via its NodePort layer.  To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://9.8.7.6.nip.io:30698/openapi/ui/`.  If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application
 
@@ -328,4 +328,4 @@ The steps below would guide you how to enable persistence for your database:
 
 In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
 
-Congratulations! You finished the lab! You got to use a few powerful tools to interact with Kubernetes to deploy a microservice into IBM Cloud Private. Although this lab is finished but the journey to Kubernetes should not end here! Head to the [Learn more](#learn-more) section to see other great resources.
+Congratulations! You finished the lab! You got to use a few powerful tools to deploy a microservice into OKD. Although this lab is finished but the journey to Kubernetes should not end here!
