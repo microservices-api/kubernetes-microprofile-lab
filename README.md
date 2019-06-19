@@ -13,7 +13,7 @@ For questions/comments about Open Liberty Docker container or Open Liberty Opera
 
 You'll need a few different artifacts to this lab.  Check if you have these installed by running:
 
-```bash
+```console
 git --help
 mvn --help
 java -help
@@ -63,11 +63,11 @@ You can clone the lab artifacts and explore the application:
 
 1. Clone the project into your machine.
     ```console
-    git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
+    $ git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
     ```
 1. Navigate into the sample application directory:
     ```console
-    cd kubernetes-microprofile-lab/lab-artifacts/application
+    $ cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. See if you can find where technologies described below are used in the application.
 
@@ -104,27 +104,27 @@ In this lab we demonstrate a best-practice pattern which separates the concerns 
 The following steps will build the sample application and create a Docker image that includes the vote microservice:
 
 1. Navigate into the sample application directory if you are not already:
-    ```bash
+    ```console
     $ cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. Build the sample application:
-    ```bash
+    ```console
     $ mvn clean package
     ```
 1. Navigate into the `lab-artifacts` directory
-    ```bash
+    ```console
     $ cd ..
     ```
 1. Build and tag the Enterprise Docker image:
-    ```bash
+    ```console
     $ docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
     ```
 1. Build and tag the Application Docker image:
-    ```bash
+    ```console
     $ docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
 1. You can use the Docker CLI to verify that your image is built.
-    ```bash
+    ```console
     $ docker images
     ```
 
@@ -133,23 +133,23 @@ The following steps will build the sample application and create a Docker image 
 OKD provides an internal, integrated container image registry. For this lab, we will use this registry to host our application image.
 
 1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
-    ```bash
+    ```console
     $ oc login --username=<username> --password=<password>
     ```
 1. Create a new project to host our application:
-    ```bash
+    ```console
     $ oc new-project myproject
     ```
 1. Log into the internal registry:
-    ```bash
+    ```console
     $ oc registry login --skip-check
     ```
 1. Tag your Docker image:
-    ```bash
+    ```console
     $ docker tag microservice-vote:1.0.0 docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
 1. Now your tagged image into the registry:
-    ```bash
+    ```console
     $ docker push docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
 1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command. You Should see 
@@ -163,57 +163,57 @@ In this part of the lab you will install an operator and a Helm chart.
 In this section, we will deploy CouchDB Helm chart. However, as OKD does not come with tiller, we will install tiller on the cluster and set up Helm CLI to be able to communicate with the tiller.
 
 1. Create a project for Tiller
-    ```bash
+    ```console
     $ oc new-project tiller
     ```
 1. Download Helm CLI and install the Helm client locally:
 
     Linux:
-    ```bash
+    ```console
     $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz | tar xz
     $ cd linux-amd64
     ```
 
     OSX:
-    ```bash
+    ```console
     $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-darwin-amd64.tar.gz | tar xz
     $ cd darwin-amd64
     ```
 
 1. Now configure the Helm client locally:
-    ```bash
+    ```console
     $ sudo mv helm /usr/local/bin
     $ sudo chmod a+x /usr/local/bin/helm
     $ helm init --client-only
     ```
 1. Install the Tiller server:
-    ```bash
+    ```console
     $ oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p TILLER_NAMESPACE="tiller" -p HELM_VERSION=v2.9.0 | oc create -f -
     $ oc rollout status deployment tiller
     ```
     Rollout process might take a few minutes to complete.
 1. If things go well, the following commands should run successfully:
-    ```bash
+    ```console
     $ helm version
     ```
 1. Grant the Tiller server `edit` and `admin` access to the current project:
-    ```bash
+    ```console
     $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
     $ oc policy add-role-to-user admin "system:serviceaccount:tiller:tiller"
     ```
 
 Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
 1. Navigate to `lab-artifacts/helm/database`:
-    ```bash
+    ```console
     $ cd ../helm/database
     ```
 1. Deploy the CouchDB Helm chart:
-    ```bash
+    ```console
     $ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
     $ helm install incubator/couchdb -f db_values.yaml --name couchdb
     ```
     Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
-     ```bash
+     ```console
     NAME                            READY   STATUS    RESTARTS   AGE
     couchdb-couchdb-0               2/2     Running   0          3m
     ```
@@ -225,11 +225,11 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
 #### Install Open Liberty artifacts
 
 1. Navigate to Open Liberty Operator artifact directory:
-    ```bash
+    ```console
     $ cd lab-artifacts/operator/open-liberty-operator
     ```
 1. Install Open Liberty Operator artifacts:
-    ```bash
+    ```console
     $ kubectl apply -f olm/open-liberty-crd.yaml
     $ kubectl apply -f deploy/service_account.yaml
     $ kubectl apply -f deploy/role.yaml
@@ -237,18 +237,18 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     $ kubectl apply -f deploy/operator.yaml
     ```
 1. Creating a custom Security Context Constraints (SCC). SCC controls the actions that a pod can perform and what it has the ability to access.
-    ```bash
+    ```console
     $ kubectl apply -f deploy/ibm-open-liberty-scc.yaml --validate=false
     ```
 1. Grant the default namespace's service account access to the newly created SCC, `ibm-open-liberty-scc`.
-    ```bash
+    ```console
     $ oc adm policy add-scc-to-group ibm-open-liberty-scc system:serviceaccounts:myproject
     ```
 
 #### Deploy application
 
 1. Deploy the microservice application using the provided CR:
-    ```bash
+    ```console
     $ cd ../application
     $ kubectl apply -f application-cr.yaml
     ```
@@ -277,11 +277,11 @@ The update scenario is that you will increase the number of replicas for the Lib
 
 1. In `lab-artifacts/operator/application/application-cr.yaml` file, change `replicaCount` value to 3.
 1. Navigate to `lab-artifacts/operator/application` directory:
-    ```bash
+    ```console
     $ cd lab-artifacts/operator/application
     ```
 1. Apply the changes into the cluster:
-    ```bash
+    ```console
     $ kubectl apply -f application-cr.yaml
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`. It might take a few minutes until all the pods are ready.
