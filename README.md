@@ -11,8 +11,7 @@ For questions/comments about Open Liberty Docker container or Open Liberty Opera
 
 # Before you begin
 
-You'll need a few different artifacts to this lab.  _If you are running these commands on the same VM as the one you installed OKD, all commands except Maven are installed._
-Check if you have these installed by running:
+You'll need a few different artifacts to this lab. It is highly recommended to run the lab on the same VM you installed your OKD cluster on as it should have all the necessary tools already installed. Otherwise make sure you have have the following packages installed:
 
 ```console
 $ git --help
@@ -26,7 +25,7 @@ $ :oc --help
 If any of these are not installed:
 
 * Install [Git client](https://git-scm.com/download/mac)
-* Install [Maven](https://access.redhat.com/documentation/en-us/red_hat_jboss_fuse/6.2.1/html/installation_on_jboss_eap/install_maven)
+* Install [Maven](https://maven.apache.org/download.cgi)
 * Install [Docker engine](https://docs.docker.com/engine/installation/)
 * Install [Java 8](https://java.com/en/download/)
 * Install [kubectl](https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz)
