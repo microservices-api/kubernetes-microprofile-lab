@@ -11,7 +11,7 @@ For questions/comments about Open Liberty Docker container or Open Liberty Opera
 
 # Before you begin
 
-You'll need a few different artifacts to this lab. It is highly recommended to run the lab on the same VM you installed your OKD cluster on as it should have all the necessary tools already installed. Otherwise make sure you have have the following packages installed:
+You'll need a few different artifacts to this lab. It is highly recommended to run the lab on the same VM you installed your OKD cluster on as it should have all the necessary tools already installed. Otherwise, make sure you have have the following packages installed:
 
 ```console
 $ git --help
@@ -19,7 +19,7 @@ $ mvn --help
 $ java -help
 $ docker --help
 $ kubectl --help
-$ :oc --help
+$ oc --help
 ```
 
 If any of these are not installed:
