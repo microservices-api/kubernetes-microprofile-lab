@@ -61,7 +61,11 @@ The vote microservice stores feedback from the sessions and displays how well al
 
 You can clone the lab artifacts and explore the application:
 
-1. Clone the project into your machine.
+1. Navigate to your home directory:
+    ```console
+    cd ~
+    ```
+1. Clone the project into your machine:
     ```console
     $ git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
     ```
@@ -131,6 +135,14 @@ The following steps will build the sample application and create a Docker image 
 ## Part 1B: Upload the Docker image to OKD's internal registry
 
 OKD provides an internal, integrated container image registry. For this lab, we will use this registry to host our application image.
+**NOTE:** If you are running the lab on the same VM as OKD, run the following two commands and then skip to the next section.
+1. Tag your docker image:
+    ```bash
+    docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+    ```
+1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
+
+Run the following steps **only** if you are running the lab on a system other than the OKD VM:
 
 1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```console
@@ -152,7 +164,7 @@ OKD provides an internal, integrated container image registry. For this lab, we 
     ```console
     $ docker push docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
-1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command. You Should see 
+1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
 
 ## Part 2: Deploy Open Liberty operator and and CouchDB Helm chart
 
@@ -194,8 +206,9 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     Rollout process might take a few minutes to complete. You can check the status of the deployment using `oc get deployment`.
 1. If things go well, the following commands should run successfully and you will see version of both the client and the server:
     ```console
-    $ helm version
+    $ helm version --tiller-namespace=tiller
     ```
+    Since we did not install Tiller in its default namespace (`kube-system`), we had to specify `--tiller-namespace=tiller`. Alternatively, you can run `export TILLER_NAMESPACE=tiller` instead of specifying `--tiller-namespace=tiller` in your Helm commands.
 1. Grant the Tiller server `edit` and `admin` access to the current project:
     ```console
     $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
@@ -203,21 +216,25 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     ```
 
 Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
-1. Navigate to `lab-artifacts/helm/database`:
+1. Navigate to `kubernetes-microprofile-lab/lab-artifacts/helm/database`:
     ```console
-    $ cd ../helm/database
+    $ cd /lab-artifacts/helm/database
     ```
-1. Switch to your application project:
+1. Create a new project to host our application called `myproject`:
+    ```console
+    $ oc new-project myproject
+    If you have already created the `myproject`, then switch to the project:
     ```console
     $ oc project myproject
     ```
 1. Allow the `myproject` namespace to run containers as any UID by changing the namespace's Security Context Constraints (SCC):
     ```console
+    $ oc adm policy add-scc-to-group anyuid system:serviceaccount:myproject
     $ oc adm policy add-scc-to-user anyuid system:serviceaccount:myproject:default
     ```
 1. Deploy the CouchDB Helm chart:
     ```console
-    $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb
+    $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb --tiller-namespace=tiller
     ```
     Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
      ```console
@@ -241,6 +258,8 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     $ kubectl apply -f deploy/
     ```
 
+    You would need to wait for the Open Liberty Operator installation to be completed. You can check the status using `kubectl get pods` and wait until the `open-liberty-operator` pod is ready.
+
 #### Deploy application
 
 1. Deploy the microservice application using the provided CR:
@@ -249,7 +268,7 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     $ kubectl apply -f application-cr.yaml
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `kubectl get pods` and then fetch the logs of the Liberty pod with `kubectl logs <pod>`.
-1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://9.8.7.6.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `https://console.<okd_ip>.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application

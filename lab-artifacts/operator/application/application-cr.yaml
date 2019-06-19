@@ -22,10 +22,6 @@ spec:
         secretKeyRef:
           name: couchdb-couchdb
           key: adminPassword
-  ingress:
-    enabled: true
-    rewriteTarget: "/"
-    path: "/"
   microprofile:
     health:
       enabled: true
