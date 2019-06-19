@@ -51,7 +51,7 @@ This lab will walk you through the deployment of our sample MicroProfile applica
 
 ## Setting up the cluster
 
-To setup a VM in vLaunch and install OKD, see [instructions here](https://apps.na.collabserv.com/wikis/home?lang=en-us#!/wiki/Wfe97e7c353a2_4510_8471_7148220c0bec/page/Setting%20up%20a%20vLaunch%20System%20for%20Red%20Hat%20OpenShift%20Lab). If you do not have access to IBM's vLaunch, follow [instructions here](https://github.com/gshipley/installcentos).
+To setup a VM in vLaunch and install OKD, see [instructions here](https://apps.na.collabserv.com/wikis/home?lang=en-us#!/wiki/Wfe97e7c353a2_4510_8471_7148220c0bec/page/Setting%20up%20a%20vLaunch%20System%20for%20Red%20Hat%20OpenShift%20Lab).
 
 ## Part 1A: Build the application and Docker container
 
@@ -105,28 +105,27 @@ The following steps will build the sample application and create a Docker image 
 
 1. Navigate into the sample application directory if you are not already:
     ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts/application
+    $ cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. Build the sample application:
     ```bash
-    mvn clean package
+    $ mvn clean package
     ```
 1. Navigate into the `lab-artifacts` directory
     ```bash
-    cd ..
+    $ cd ..
     ```
 1. Build and tag the Enterprise Docker image:
     ```bash
-    cd ..
-    docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
+    $ docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
     ```
 1. Build and tag the Application Docker image:
     ```bash
-    docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
+    $ docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
 1. You can use the Docker CLI to verify that your image is built.
     ```bash
-    docker images
+    $ docker images
     ```
 
 ## Part 1B: Upload the Docker image to OKD's internal registry
@@ -135,80 +134,83 @@ OKD provides an internal, integrated container image registry. For this lab, we 
 
 1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```bash
-    oc login --username=<username> --password=<password>
+    $ oc login --username=<username> --password=<password>
     ```
 1. Create a new project to host our application:
     ```bash
-    oc new-project myproject
+    $ oc new-project myproject
     ```
 1. Log into the internal registry:
     ```bash
-    oc registry login --skip-check
+    $ oc registry login --skip-check
     ```
 1. Tag your Docker image:
     ```bash
-    docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+    $ docker tag microservice-vote:1.0.0 docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
 1. Now your tagged image into the registry:
     ```bash
-    docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+    $ docker push docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
-1. Your image is now available in the Docker registry in OKD. You can verify this through the OKD's Registry Dashboard at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
+1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command. You Should see 
 
 ## Part 2: Deploy Open Liberty operator and and CouchDB Helm chart
 
 In this part of the lab you will install an operator and a Helm chart.
 
-### Deploy CouchDB
+### Deploy CouchDB Helm
 
-In this section we will deploy CouchDB Helm chart. OKD does not come with tiller. So we need to install tiller first.
+In this section, we will deploy CouchDB Helm chart. However, as OKD does not come with tiller, we will install tiller on the cluster and set up Helm CLI to be able to communicate with the tiller.
 
 1. Create a project for Tiller
     ```bash
-    oc new-project tiller
-    ```
-    If you already have `tiller` project, switch to the project:
-    ```bash
-    oc project tiller
+    $ oc new-project tiller
     ```
 1. Download Helm CLI and install the Helm client locally:
 
     Linux:
     ```bash
-    curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.14.1-linux-amd64.tar.gz | tar xz
-    cd linux-amd64
-    ```
-    OSX:
-    ```bash
-    curl -s https://storage.googleapis.com/kubernetes-helm/ lm-v2.14.1-darwin-amd64.tar.gz | tar xz
-    cd darwin-amd64
+    $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz | tar xz
+    $ cd linux-amd64
     ```
 
-    Now configure the Helm client locally:
+    OSX:
     ```bash
-    sudo mv helm /usr/local/bin
-    sudo chmod a+x /usr/local/bin/helm
-    ./helm init --client-only
+    $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-darwin-amd64.tar.gz | tar xz
+    $ cd darwin-amd64
+    ```
+
+1. Now configure the Helm client locally:
+    ```bash
+    $ sudo mv helm /usr/local/bin
+    $ sudo chmod a+x /usr/local/bin/helm
+    $ helm init --client-only
     ```
 1. Install the Tiller server:
     ```bash
-    oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p TILLER_NAMESPACE="tiller" -p HELM_VERSION=v2.14.1 | oc create -f -
-    oc rollout status deployment tiller
+    $ oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p TILLER_NAMESPACE="tiller" -p HELM_VERSION=v2.9.0 | oc create -f -
+    $ oc rollout status deployment tiller
     ```
+    Rollout process might take a few minutes to complete.
 1. If things go well, the following commands should run successfully:
     ```bash
-    helm version
+    $ helm version
+    ```
+1. Grant the Tiller server `edit` and `admin` access to the current project:
+    ```bash
+    $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
+    $ oc policy add-role-to-user admin "system:serviceaccount:tiller:tiller"
     ```
 
-Now that the Helm is configured locally and on OKD, you can deploy CouchDB Helm chart.
+Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
 1. Navigate to `lab-artifacts/helm/database`:
     ```bash
-    cd lab-artifacts/helm/database
+    $ cd ../helm/database
     ```
 1. Deploy the CouchDB Helm chart:
     ```bash
-    helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-    helm install incubator/couchdb -f db_values.yaml --name couchdb 
+    $ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+    $ helm install incubator/couchdb -f db_values.yaml --name couchdb
     ```
     Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
      ```bash
@@ -224,36 +226,34 @@ Now that the Helm is configured locally and on OKD, you can deploy CouchDB Helm 
 
 1. Navigate to Open Liberty Operator artifact directory:
     ```bash
-    cd lab-artifacts/operator/open-liberty-operator
+    $ cd lab-artifacts/operator/open-liberty-operator
     ```
 1. Install Open Liberty Operator artifacts:
     ```bash
-    kubectl apply -f olm/open-liberty-crd.yaml
-    kubectl apply -f deploy/service_account.yaml
-    kubectl apply -f deploy/role.yaml
-    kubectl apply -f deploy/role_binding.yaml
-    kubectl apply -f deploy/operator.yaml
+    $ kubectl apply -f olm/open-liberty-crd.yaml
+    $ kubectl apply -f deploy/service_account.yaml
+    $ kubectl apply -f deploy/role.yaml
+    $ kubectl apply -f deploy/role_binding.yaml
+    $ kubectl apply -f deploy/operator.yaml
     ```
 1. Creating a custom Security Context Constraints (SCC). SCC controls the actions that a pod can perform and what it has the ability to access.
     ```bash
-    kubectl apply -f deploy/ibm-open-liberty-scc.yaml --validate=false
+    $ kubectl apply -f deploy/ibm-open-liberty-scc.yaml --validate=false
     ```
-1. Grant the default namespace's service account access to the newly created SCC, `ibm-open-liberty-scc`. Update `<namespace>` with the appropriate namespace:
+1. Grant the default namespace's service account access to the newly created SCC, `ibm-open-liberty-scc`.
     ```bash
-    oc adm policy add-scc-to-group ibm-open-liberty-scc system:serviceaccounts:<namespace>
+    $ oc adm policy add-scc-to-group ibm-open-liberty-scc system:serviceaccounts:myproject
     ```
 
 #### Deploy application
 
 1. Deploy the microservice application using the provided CR:
     ```bash
-    cd ../application
-    kubectl apply -f application-cr.yaml
+    $ cd ../application
+    $ kubectl apply -f application-cr.yaml
     ```
 1. You can view the status of your deployment by running `kubectl get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `kubectl get pods` and then fetch the logs of the Liberty pod with `kubectl logs <pod>`.
-1. Use `kubectl get ing | awk 'FNR == 2 {print $3;}'` to determine the address of the application. Note: If the previous command is printing out a port, such as `80`, please wait a few more minutes for the `URL` to be available.  
-1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
-1. If you find that your OKD ingress is taking too long to return the result of the invocation and you get a timeout error, you can bypass the ingress and reach the application via its NodePort layer.  To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://9.8.7.6.nip.io:30698/openapi/ui/`.  If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `http://9.8.7.6.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application
@@ -269,62 +269,22 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our microservice into the CouchDB database.
 1. Feel free to explore the other APIs and play around with the microservice!
 
-## Part 4: Update the Helm release
+## Part 4: Update the Liberty Operator release
 
-In this part of the lab you will practice how to make changes to the Helm release you just deployed on the cluster using the Helm CLI.
+In this part of the lab you will practice how to make changes to the Liberty deployment you just deployed on the cluster using the Open Liberty Operator.
 
-So far, the database you deployed stores the data inside the container running the database. This means if the container gets deleted or restarted for any reason, all the data stored in the database would be lost.
+The update scenario is that you will increase the number of replicas for the Liberty deployment to 3. That will increase the number of Open Liberty pods to 3.
 
-In order to store the data outside of the database container, you would need to enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by an automatic provisioner.
-
-The steps below would guide you how to enable persistence for your database:
-
-1. In [Part 3](#Part-3-Explore-the-application), you would've observed that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
-1. Find the name of the pod that is running the database container:
+1. In `lab-artifacts/operator/application/application-cr.yaml` file, change `replicaCount` value to 3.
+1. Navigate to `lab-artifacts/operator/application` directory:
     ```bash
-    kubectl get pods
+    $ cd lab-artifacts/operator/application
     ```
-    You should see a pod name similar to `couchdb-couchdb-0`.
-1. Delete the CouchDB pod to delete the container running the database.
+1. Apply the changes into the cluster:
     ```bash
-    kubectl delete pod couchdb-couchdb-0
+    $ kubectl apply -f application-cr.yaml
     ```
-1. Run the following command to see the state of deployments:
-    ```bash
-    kubectl get pods
-    ```
-    You should get an output similar to the following:
-    ```bash
-    NAME                                        READY   STATUS    RESTARTS   AGE
-    couchdb-couchdb-0                           2/2     Running   0          3m
-    vote-userx-ibm-open-5b44d988bd-kqrjn   1/1     Running   0          3m
-    ```
-    Again, you need to wait until the couchdb pod is ready. Wait until the value under `READY` column becomes `2/2`. 
-
-1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it returns 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
-1. Now let's enable persistence for our database:
-    ```bash
-    helm upgrade  --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
-    ```
-1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
-    ```bash
-    helm upgrade  --recreate-pods --force --reuse-values --set replicaCount=2 <release_name> ibm-charts/ibm-open-liberty
-    ```
-1. List the deployed packages with their chart versions by running:
-    ```bash
-    helm ls
-    ```
-    You can see that the number of revision should be 2 now for couchdb and Liberty.
-1. Run the following command to see the state of deployments:
-    ```bash
-    kubectl get pods
-    ```
-    You need to wait until the couchdb and Liberty pods become ready. The old pods may be terminating while the new ones start up.
-
-    For Liberty, you will now see 2 pods, since we increased the number of replicas.
-1. Refresh the page. You may need to add the security exception again. If you get `Failed to load API definition` message then try refreshing again.
-1. Now add a new attendee through the OpenAPI UI as before.
-1. Now repeat Steps 1-5 in this section to see that even though you delete the couchdb database container, data still gets recovered from the PersistentVolume.
+1. You can view the status of your deployment by running `kubectl get deployments`. It might take a few minutes until all the pods are ready.
 
 In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
 
