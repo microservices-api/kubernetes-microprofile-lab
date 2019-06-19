@@ -11,21 +11,22 @@ For questions/comments about Open Liberty Docker container or Open Liberty Opera
 
 # Before you begin
 
-You'll need a few different artifacts to this lab.  Check if you have these installed by running:
+You'll need a few different artifacts to this lab.  _If you are running these commands on the same VM as the one you installed OKD, all commands except Maven are installed._
+Check if you have these installed by running:
 
 ```console
-git --help
-mvn --help
-java -help
-docker --help
-kubectl --help
-oc --help
+$ git --help
+$ mvn --help
+$ java -help
+$ docker --help
+$ kubectl --help
+$ :oc --help
 ```
 
 If any of these are not installed:
 
 * Install [Git client](https://git-scm.com/download/mac)
-* Install [Maven](https://maven.apache.org/download.cgi)
+* Install [Maven](https://access.redhat.com/documentation/en-us/red_hat_jboss_fuse/6.2.1/html/installation_on_jboss_eap/install_maven)
 * Install [Docker engine](https://docs.docker.com/engine/installation/)
 * Install [Java 8](https://java.com/en/download/)
 * Install [kubectl](https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz)
@@ -134,7 +135,7 @@ OKD provides an internal, integrated container image registry. For this lab, we 
 
 1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```console
-    $ oc login --username=<username> --password=<password>
+    $ oc login --username=<username> --password=<password> https://console.<okd_ip>.nip.io:8443/
     ```
 1. Create a new project to host our application:
     ```console
@@ -142,7 +143,7 @@ OKD provides an internal, integrated container image registry. For this lab, we 
     ```
 1. Log into the internal registry:
     ```console
-    $ oc registry login --skip-check
+    $ docker login -u $(oc whoami) -p $(oc whoami -t) docker-registry-default.apps.<okd_ip>.nip.io
     ```
 1. Tag your Docker image:
     ```console
@@ -180,7 +181,7 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     $ cd darwin-amd64
     ```
 
-1. Now configure the Helm client locally:
+1. Now configure the Helm client locally. **Note:** _This will replace your current's Helm CLI. If you can create a back up of your current Helm CLI and replace the lab's Helm CLI after you are done with the lab_:
     ```console
     $ sudo mv helm /usr/local/bin
     $ sudo chmod a+x /usr/local/bin/helm
@@ -191,8 +192,8 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     $ oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p TILLER_NAMESPACE="tiller" -p HELM_VERSION=v2.9.0 | oc create -f -
     $ oc rollout status deployment tiller
     ```
-    Rollout process might take a few minutes to complete.
-1. If things go well, the following commands should run successfully:
+    Rollout process might take a few minutes to complete. You can check the status of the deployment using `oc get deployment`.
+1. If things go well, the following commands should run successfully and you will see version of both the client and the server:
     ```console
     $ helm version
     ```
@@ -207,10 +208,17 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```console
     $ cd ../helm/database
     ```
+1. Switch to your application project:
+    ```console
+    $ oc project myproject
+    ```
+1. Allow the `myproject` namespace to run containers as any UID by changing the namespace's Security Context Constraints (SCC):
+    ```console
+    $ oc adm policy add-scc-to-user anyuid system:serviceaccount:myproject:default
+    ```
 1. Deploy the CouchDB Helm chart:
     ```console
-    $ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-    $ helm install incubator/couchdb -f db_values.yaml --name couchdb
+    $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb
     ```
     Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
      ```console
@@ -226,23 +234,12 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
 
 1. Navigate to Open Liberty Operator artifact directory:
     ```console
-    $ cd lab-artifacts/operator/open-liberty-operator
+    $ cd ../../operator/open-liberty-operator
     ```
 1. Install Open Liberty Operator artifacts:
     ```console
-    $ kubectl apply -f olm/open-liberty-crd.yaml
-    $ kubectl apply -f deploy/service_account.yaml
-    $ kubectl apply -f deploy/role.yaml
-    $ kubectl apply -f deploy/role_binding.yaml
-    $ kubectl apply -f deploy/operator.yaml
-    ```
-1. Creating a custom Security Context Constraints (SCC). SCC controls the actions that a pod can perform and what it has the ability to access.
-    ```console
-    $ kubectl apply -f deploy/ibm-open-liberty-scc.yaml --validate=false
-    ```
-1. Grant the default namespace's service account access to the newly created SCC, `ibm-open-liberty-scc`.
-    ```console
-    $ oc adm policy add-scc-to-group ibm-open-liberty-scc system:serviceaccounts:myproject
+    $ kubectl apply -f olm/
+    $ kubectl apply -f deploy/
     ```
 
 #### Deploy application
