@@ -26,6 +26,9 @@ spec:
     health:
       enabled: true
   pod:
+    security:
+      securityContext:
+        runAsNonRoot: true
     labels:
       application: conference
   monitoring:

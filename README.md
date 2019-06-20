@@ -227,22 +227,21 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```console
     $ oc project myproject
     ```
-1. Allow the `myproject` namespace to run containers as any UID by changing the namespace's Security Context Constraints (SCC):
+1. Allow the default service account for the `myproject` namespace to run containers as any UID:
     ```console
-    $ oc adm policy add-scc-to-group anyuid system:serviceaccount:myproject
     $ oc adm policy add-scc-to-user anyuid system:serviceaccount:myproject:default
     ```
 1. Deploy the CouchDB Helm chart:
     ```console
     $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb --tiller-namespace=tiller
     ```
-    Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
+    Ensure the CouchDB pod is up and running by executing `oc get pods` command. Your output will look similar to the following:
      ```console
     NAME                            READY   STATUS    RESTARTS   AGE
     couchdb-couchdb-0               2/2     Running   0          3m
     ```
 
-    You need to wait until the value under `READY` column becomes `2/2`. Re-run the `kubectl get pods` command if necessary.
+    You need to wait until the value under `READY` column becomes `2/2`. Re-run the `oc get pods` command if necessary.
 
 ### Deploy Liberty
 
@@ -254,21 +253,24 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```
 1. Install Open Liberty Operator artifacts:
     ```console
-    $ kubectl apply -f olm/
-    $ kubectl apply -f deploy/
+    $ oc apply -f olm/open-liberty-crd.yaml
+    $ oc apply -f deploy/service_account.yaml
+    $ oc apply -f deploy/role.yaml
+    $ oc apply -f deploy/role_binding.yaml
+    $ oc apply -f deploy/operator.yaml
     ```
 
-    You would need to wait for the Open Liberty Operator installation to be completed. You can check the status using `kubectl get pods` and wait until the `open-liberty-operator` pod is ready.
+    You would need to wait for the Open Liberty Operator installation to be completed. You can check the status using `oc get pods` and wait until the `open-liberty-operator` pod is ready.
 
 #### Deploy application
 
 1. Deploy the microservice application using the provided CR:
     ```console
     $ cd ../application
-    $ kubectl apply -f application-cr.yaml
+    $ oc apply -f application-cr.yaml
     ```
-1. You can view the status of your deployment by running `kubectl get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `kubectl get pods` and then fetch the logs of the Liberty pod with `kubectl logs <pod>`.
-1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `kubectl get services` and then running the command `kubectl describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `https://console.<okd_ip>.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. You can view the status of your deployment by running `oc get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `oc get pods` and then fetch the logs of the Liberty pod with `oc logs <pod>`.
+1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `oc get services` and then running the command `oc describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `https://console.<okd_ip>.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application
@@ -297,9 +299,9 @@ The update scenario is that you will increase the number of replicas for the Lib
     ```
 1. Apply the changes into the cluster:
     ```console
-    $ kubectl apply -f application-cr.yaml
+    $ oc apply -f application-cr.yaml
     ```
-1. You can view the status of your deployment by running `kubectl get deployments`. It might take a few minutes until all the pods are ready.
+1. You can view the status of your deployment by running `oc get deployments`. It might take a few minutes until all the pods are ready.
 
 In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
 
