@@ -61,9 +61,13 @@ The vote microservice stores feedback from the sessions and displays how well al
 
 You can clone the lab artifacts and explore the application:
 
+1. Login into the cluster
+    ```console
+    $ oc login 
+    ```
 1. Navigate to your home directory:
     ```console
-    cd ~
+    $ cd ~
     ```
 1. Clone the project into your machine:
     ```console
@@ -131,20 +135,48 @@ The following steps will build the sample application and create a Docker image 
     ```console
     $ docker images
     ```
+    If things have gone well, the output should look like this:
+    ```console
+    REPOSITORY                                                     TAG       IMAGE ID        CREATED         SIZE
+    microservice-vote                                              1.0.0     8fe8ff1be07d    24 hours ago    369 MB
+    microservice-enterprise-web                                    1.0.0     61d03c45ca21    25 hours ago    350 MB
+    ```
 
 ## Part 1B: Upload the Docker image to OKD's internal registry
 
-OKD provides an internal, integrated container image registry. For this lab, we will use this registry to host our application image.
-**NOTE:** If you are running the lab on the same VM as OKD, run the following two commands and then skip to the next section.
-1. Tag your docker image:
-    ```bash
-    docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+OKD provides an internal, integrated container image registry that is installed in your cluster. For this lab, we will use this registry to host our application image.
+
+If you are using the same VM as the OKD VM, your images will be available in OKD's container registry for consumption after you run the following steps. But if you are not running on the same VM, skip the following 6 commands and continue from there:
+
+1. Ensure you are logged in to OKD. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
+    ```console
+    $ oc login --username=<username> --password=<password> https://console.<okd_ip>.nip.io:8443/
     ```
-1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
+1. Create a project to in OKD:
+    ```bash
+    $ oc new-project myproject
+    ```
+1. Tag your docker image to make it available to be used in `myproject`:
+    ```bash
+    $ docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+    ```
+1. You can use the Docker CLI to verify that your image is built.
+    ```console
+    $ docker images
+    ```
+    The output should now look like this:
+    ```console
+    REPOSITORY                                                     TAG       IMAGE ID        CREATED         SIZE
+    docker-registry.default.svc:5000/myproject/microservice-vote   1.0.0     8fe8ff1be07d    24 hours ago    369 MB
+    microservice-vote                                              1.0.0     8fe8ff1be07d    24 hours ago    369 MB
+    microservice-enterprise-web                                    1.0.0     61d03c45ca21    25 hours ago    350 MB
+    ```
+1. You can also see your image the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
+1. You skip the next few commands and go to Part 2.
 
 Run the following steps **only** if you are running the lab on a system other than the OKD VM:
 
-1. Ensure you are logged in to OKD. You can use OKD command line interface (CLI) to interact with the cluster. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
+1. Ensure you are logged in to OKD. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```console
     $ oc login --username=<username> --password=<password> https://console.<okd_ip>.nip.io:8443/
     ```
@@ -164,7 +196,7 @@ Run the following steps **only** if you are running the lab on a system other th
     ```console
     $ docker push docker-registry-default.apps.<okd_ip>.nip.io/myproject/microservice-vote:1.0.0
     ```
-1. Your image is now available in the internal registry in OKD. You can verify this through the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
+1. To verify your image is available in the registry, check the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. Use the same username and password as the one used in `oc login` command.
 
 ## Part 2: Deploy Open Liberty operator and and CouchDB Helm chart
 
@@ -220,10 +252,7 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```console
     $ cd /lab-artifacts/helm/database
     ```
-1. Create a new project to host our application called `myproject`:
-    ```console
-    $ oc new-project myproject
-    If you have already created the `myproject`, then switch to the project:
+1. Switch project to `myproject`:
     ```console
     $ oc project myproject
     ```
