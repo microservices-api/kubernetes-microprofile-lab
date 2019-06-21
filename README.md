@@ -272,7 +272,13 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
 
     You need to wait until the value under `READY` column becomes `2/2`. Re-run the `oc get pods` command if necessary.
 
-### Deploy Liberty
+### Deploy Open Liberty Operators
+
+Before we deploy an Open Liberty Operator, watch these two videos to get familiar with Operators
+* [Red Hat OpenShift: Operators Framework](https://youtu.be/LymzLHRbQdk)
+* [Keynote: Maturing Kubernetes Operators](https://youtu.be/kld1Fi8RrRQ)
+
+If you need more information about Operators, here is a good source to start: [Operators on Red Hat OpenShift](https://www.openshift.com/learn/topics/operators).
 
 #### Install Open Liberty artifacts
 
@@ -280,12 +286,18 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```console
     $ cd ../../operator/open-liberty-operator
     ```
-1. Install Open Liberty Operator artifacts:
+1. Install Open Liberty Operator Lifecycle Manager (OLM):
     ```console
     $ oc apply -f olm/open-liberty-crd.yaml
+    ```
+1. Open Liberty Operator requires the following Kubernetes resources to be installed: ServiceAccount, Role and RoleBinding resources. Run the following commands to deploy them:
+    ```console
     $ oc apply -f deploy/service_account.yaml
     $ oc apply -f deploy/role.yaml
     $ oc apply -f deploy/role_binding.yaml
+    ```
+1. Now create an instance of the Open Liberty operator:
+    ```console
     $ oc apply -f deploy/operator.yaml
     ```
 
