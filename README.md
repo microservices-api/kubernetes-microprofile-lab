@@ -264,7 +264,7 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
     ```console
     $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb --tiller-namespace=tiller
     ```
-    Ensure the CouchDB pod is up and running by executing `oc get pods` command. Your output will look similar to the following:
+    Ensure the CouchDB pod is up and running by executing `oc get pods` command. It might take a few minutes and the CouchDB pod might restart a few times but eventually the output of should look similar to the following:
      ```console
     NAME                            READY   STATUS    RESTARTS   AGE
     couchdb-couchdb-0               2/2     Running   0          3m
