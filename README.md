@@ -49,9 +49,9 @@ Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can
 
 This lab will walk you through the deployment of our sample MicroProfile application into an OKD cluster. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize an operator that deploys an Open Liberty container to OKD, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the a database that holds data for this microservice.
 
-## Setting up the cluster
+## Setting up an OKD cluster
 
-To setup a VM in vLaunch and install OKD, see [instructions here](https://apps.na.collabserv.com/wikis/home?lang=en-us#!/wiki/Wfe97e7c353a2_4510_8471_7148220c0bec/page/Setting%20up%20a%20vLaunch%20System%20for%20Red%20Hat%20OpenShift%20Lab).
+Follow instructions in [Install Red Hat OKD 3.11 on CentOS](https://github.com/gshipley/installcentos). If you are provided other instructions on this part, follow them instead.
 
 ## Part 1A: Build the application and Docker container
 
@@ -148,12 +148,16 @@ If you are using the same VM as the OKD VM, your images will be available in OKD
     ```console
     $ oc login --username=<username> --password=<password> https://console.<okd_ip>.nip.io:8443/
     ```
+1. Log into the internal registry:
+    ```console
+    $ docker login -u $(oc whoami) -p $(oc whoami -t) docker-registry.default.svc:5000
+    ```
 1. Create a project to in OKD:
-    ```bash
+    ```console
     $ oc new-project myproject
     ```
 1. Tag your docker image to make it available to be used in `myproject`:
-    ```bash
+    ```console
     $ docker tag microservice-vote:1.0.0 docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
 1. You can use the Docker CLI to verify that your image is built.
@@ -166,6 +170,10 @@ If you are using the same VM as the OKD VM, your images will be available in OKD
     docker-registry.default.svc:5000/myproject/microservice-vote   1.0.0     8fe8ff1be07d    24 hours ago    369 MB
     microservice-vote                                              1.0.0     8fe8ff1be07d    24 hours ago    369 MB
     microservice-enterprise-web                                    1.0.0     61d03c45ca21    25 hours ago    350 MB
+    ```
+1. Push your image into the registry:
+    ```console
+    docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
 1. You can also see your image the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
 1. You skip the next few commands and go to Part 2.
