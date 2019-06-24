@@ -61,10 +61,6 @@ The vote microservice stores feedback from the sessions and displays how well al
 
 You can clone the lab artifacts and explore the application:
 
-1. Login into the cluster
-    ```console
-    $ oc login 
-    ```
 1. Navigate to your home directory:
     ```console
     $ cd ~
