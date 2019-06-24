@@ -142,7 +142,7 @@ The following steps will build the sample application and create a Docker image 
 
 OKD provides an internal, integrated container image registry that is installed in your cluster. For this lab, we will use this registry to host our application image.
 
-If you are using the same VM as the OKD VM, your images will be available in OKD's container registry for consumption after you run the following steps. But if you are not running on the same VM, skip the following 6 commands and continue from there:
+If you are using the same VM as the OKD VM, your images will be available in OKD's container registry for consumption after you run the following steps. If you are not running on the same VM, skip the following few commands and continue from there:
 
 1. Ensure you are logged in to OKD. Replace `<username>`, `<password>` and `<okd_ip>` with appropriate values:
     ```console
@@ -176,7 +176,7 @@ If you are using the same VM as the OKD VM, your images will be available in OKD
     docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
 1. You can also see your image the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
-1. You skip the next few commands and go to Part 2.
+1. You skip the next few commands and go to [Part 2](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploy-open-liberty-operator-and-and-couchdb-helm-chart).
 
 Run the following steps **only** if you are running the lab on a system other than the OKD VM:
 
@@ -202,7 +202,7 @@ Run the following steps **only** if you are running the lab on a system other th
     ```
 1. To verify your image is available in the registry, check the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. Use the same username and password as the one used in `oc login` command.
 
-## Part 2: Deploy Open Liberty operator and and CouchDB Helm chart
+## Part 2: Deploy Open Liberty operator and CouchDB Helm chart
 
 In this part of the lab you will install an operator and a Helm chart.
 
