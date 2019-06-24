@@ -241,11 +241,6 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     $ helm version --tiller-namespace=tiller
     ```
     Since we did not install Tiller in its default namespace (`kube-system`), we had to specify `--tiller-namespace=tiller`. Alternatively, you can run `export TILLER_NAMESPACE=tiller` instead of specifying `--tiller-namespace=tiller` in your Helm commands.
-1. Grant the Tiller server `edit` and `admin` access to the current project:
-    ```console
-    $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
-    $ oc policy add-role-to-user admin "system:serviceaccount:tiller:tiller"
-    ```
 
 Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
 1. Navigate to `kubernetes-microprofile-lab/lab-artifacts/helm/database`:
@@ -255,6 +250,11 @@ Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm
 1. Switch project to `myproject`:
     ```console
     $ oc project myproject
+    ```
+1. Grant the Tiller server `edit` and `admin` access to the current project:
+    ```console
+    $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
+    $ oc policy add-role-to-user admin "system:serviceaccount:tiller:tiller"
     ```
 1. Allow the default service account for the `myproject` namespace to run containers as any UID:
     ```console
@@ -311,7 +311,11 @@ If you need more information about Operators, here is a good source to start: [O
     $ oc apply -f application-cr.yaml
     ```
 1. You can view the status of your deployment by running `oc get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `oc get pods` and then fetch the logs of the Liberty pod with `oc logs <pod>`.
-1. We will access the application using NodePort service. To do that, simply find the NodePort port by finding out your service name with `oc get services` and then running the command `oc describe service <myservice> | grep NodePort | awk 'FNR == 2 {print $3;}' | awk -F '/' '{print $1;}'` and then inserting that port in your current URL using `http`, for example `https://console.<okd_ip>.nip.io:30698/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. We will access the application using NodePort service. Run the following command to get the service port:
+    ```console
+    $ oc get service operator-lab-openliberty -o=jsonpath='{.spec.ports[0].nodePort}'
+    ```
+    Now, from your browser, go to `https://console.<okd_ip>.nip.io:<service_port>/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
 1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application
