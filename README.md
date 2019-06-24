@@ -228,7 +228,7 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
     $ cd darwin-amd64
     ```
 
-1. Now configure the Helm client locally. **Note:** _This will replace your current's Helm CLI. If you can create a back up of your current Helm CLI and replace the lab's Helm CLI after you are done with the lab_:
+1. Now configure the Helm client locally. **Note:** _This will replace your current's Helm CLI. You can create a back up of your current Helm CLI and replace the lab's Helm CLI after you are done with the lab_:
     ```console
     $ sudo mv helm /usr/local/bin
     $ sudo chmod a+x /usr/local/bin/helm
