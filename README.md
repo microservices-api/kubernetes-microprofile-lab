@@ -251,7 +251,7 @@ In this section, we will deploy CouchDB Helm chart. However, as OKD does not com
 Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
 1. Navigate to `kubernetes-microprofile-lab/lab-artifacts/helm/database`:
     ```console
-    $ cd /lab-artifacts/helm/database
+    $ cd ~/kubernetes-microprofile-lab/lab-artifacts/helm/database
     ```
 1. Switch project to `myproject`:
     ```console
