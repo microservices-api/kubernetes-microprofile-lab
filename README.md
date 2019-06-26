@@ -51,7 +51,9 @@ This lab will walk you through the deployment of our sample MicroProfile applica
 
 ## Setting up an OKD cluster
 
-Follow instructions in [Install Red Hat OKD 3.11 on CentOS](https://github.com/gshipley/installcentos). If you are provided other instructions on this part, follow them instead.
+**Skip this step if you are already provided other instructions on creating an OKD cluster.**
+
+1. Follow instructions in [Install Red Hat OKD 3.11 on CentOS](https://github.com/gshipley/installcentos).
 
 ## Part 1A: Build the application and Docker container
 
