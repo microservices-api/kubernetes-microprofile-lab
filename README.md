@@ -34,7 +34,7 @@ If any of these are not installed:
 ## What is **OKD**?
 
 From [okd.io](https://www.okd.io):
->OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift. OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10. If you are looking for enterprise-level support, or information on partner certification, Red Hat also offers Red Hat OpenShift Container Platform.
+> OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift. OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10. If you are looking for enterprise-level support, or information on partner certification, Red Hat also offers Red Hat OpenShift Container Platform.
 
 ## What are **Operators**?
 
@@ -135,9 +135,9 @@ The following steps will build the sample application and create a Docker image 
     ```
     If things have gone well, the output should look like this:
     ```console
-    REPOSITORY                                                     TAG       IMAGE ID        CREATED         SIZE
-    microservice-vote                                              1.0.0     8fe8ff1be07d    24 hours ago    369 MB
-    microservice-enterprise-web                                    1.0.0     61d03c45ca21    25 hours ago    350 MB
+    REPOSITORY                              TAG       IMAGE ID        CREATED         SIZE
+    microservice-vote                       1.0.0     8fe8ff1be07d    24 hours ago    369 MB
+    microservice-enterprise-web             1.0.0     61d03c45ca21    25 hours ago    350 MB
     ```
 
 ## Part 1B: Upload the Docker image to OKD's internal registry
@@ -175,7 +175,7 @@ If you are using the same VM as the OKD VM, your images will be available in OKD
     ```
 1. Push your image into the registry:
     ```console
-    docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
+    $ docker push docker-registry.default.svc:5000/myproject/microservice-vote:1.0.0
     ```
 1. You can also see your image the OKD's Registry Dashboard available at `https://registry-console-default.apps.<okd_ip>.nip.io/registry`. You can use the same username and password as the one used in `oc login` command.
 1. You skip the next few commands and go to [Part 2](https://github.com/microservices-api/kubernetes-microprofile-lab#part-2-deploy-open-liberty-operator-and-and-couchdb-helm-chart).
