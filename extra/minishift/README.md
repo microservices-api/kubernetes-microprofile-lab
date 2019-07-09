@@ -1,6 +1,4 @@
 
-**Under constructions**  This lab is being re-worked to run on Minishift
-
 ![Overview](../../images/diagram_general.png)
 
 # MicroProfile Lab with Open Liberty and Minishift
