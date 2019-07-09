@@ -282,9 +282,9 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
 1. Place your username (e.g. userX) in the `id` field, and place your name in the `name` field.
-    ![image](../images/post_screenshot.png)
+    ![image](../../images/post_screenshot.png)
 1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  This entry has now been saved into the CouchDB database that our microservice is using.
-    ![image](../images/post_result.png)
+    ![image](../../images/post_result.png)
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and type into the textbox the `id` you entered from the previous step.
 1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our microservice into the CouchDB database.
 1. Feel free to explore the other APIs and play around with the microservice!
