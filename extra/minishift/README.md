@@ -7,7 +7,7 @@ This lab illustrates steps to deploy a MicroProfile application, running in a Op
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
-For questions/comments about Liberty's Docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
+For questions/comments about Liberty's Docker container please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
 
 # Before you begin
 
@@ -18,7 +18,6 @@ git --help
 mvn --help
 java -help
 docker --help
-helm --help
 ```
 
 If any of these is not installed:
@@ -27,12 +26,25 @@ If any of these is not installed:
 * Install [Maven](https://maven.apache.org/download.cgi)
 * Install [Docker engine](https://docs.docker.com/engine/installation/)
 * Install [Java 8](https://java.com/en/download/)
-* Install [helm](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.0/app_center/create_helm_cli.html)
+
+## What is minishift
+
+From [okd.io/minishift](https://www.okd.io/minishift/):
+> Minishift is a tool that helps you run OKD locally by launching a single-node OKD cluster inside a virtual machine. With Minishift you can try out OKD or develop with it, day-to-day, on your local machine. You can run Minishift on the Windows, macOS, and GNU/Linux operating systems. Minishift uses libmachine for provisioning virtual machines, and OKD for running the cluster.
+
+## What are **Operators**?
+
+From [Red Hat](https://www.redhat.com/en/blog/introducing-operator-framework-building-apps-kubernetes):
+> An Operator is a method of packaging, deploying and managing a Kubernetes application. A Kubernetes application is an application that is both deployed on Kubernetes and managed using the Kubernetes APIs and kubectl tooling. To be able to make the most of Kubernetes, you need a set of cohesive APIs to extend in order to service and manage your applications that run on Kubernetes. You can think of Operators as the runtime that manages this type of application on Kubernetes.
+
+## What are **Helm charts**?
+
+Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
 
 
 # Deploying a MicroProfile application in a Minishift cluster
 
-This lab will walk you through the deployment of our sample MicroProfile Application into a Minishift cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
+This lab will walk you through the deployment of our sample MicroProfile Application into a Minishift cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in minishift, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
 ## Installing Minishift
 
@@ -136,7 +148,7 @@ We will use Minishift's internal Docker registry to host our image.
     ```console
     $ docker tag microservice-vote:1.0.0 $(minishift openshift registry)/myproject/microservice-vote:1.0.0
     ```
-1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP Docker registry:
+1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the minishift Docker registry:
     ```console
     $ docker push $(minishift openshift registry)/myproject/microservice-vote:1.0.0
     ```
