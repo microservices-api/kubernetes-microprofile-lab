@@ -1,7 +1,5 @@
 
-**Under constructions**  This lab is being re-worked to run on Minishift
-
-![Overview](images/arch_diagram_new.png)
+![Overview](../../images/diagram_general.png)
 
 # MicroProfile Lab with Open Liberty and Minishift
 
@@ -9,7 +7,7 @@ This lab illustrates steps to deploy a MicroProfile application, running in a Op
 
 If you find an issue with the lab instruction you can [report it](https://github.com/microservices-api/kubernetes-microprofile-lab/issues) or better yet, [submit a PR](https://github.com/microservices-api/kubernetes-microprofile-lab/pulls).
 
-For questions/comments about Liberty's Docker container or IBM Cloud Private please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
+For questions/comments about Liberty's Docker container please email [Arthur De Magalhaes](mailto:arthurdm@ca.ibm.com).
 
 # Before you begin
 
@@ -20,7 +18,6 @@ git --help
 mvn --help
 java -help
 docker --help
-helm --help
 ```
 
 If any of these is not installed:
@@ -29,18 +26,33 @@ If any of these is not installed:
 * Install [Maven](https://maven.apache.org/download.cgi)
 * Install [Docker engine](https://docs.docker.com/engine/installation/)
 * Install [Java 8](https://java.com/en/download/)
-* Install [helm](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.0/app_center/create_helm_cli.html)
+
+## What is minishift
+
+From [okd.io/minishift](https://www.okd.io/minishift/):
+> Minishift is a tool that helps you run OKD locally by launching a single-node OKD cluster inside a virtual machine. With Minishift you can try out OKD or develop with it, day-to-day, on your local machine. You can run Minishift on the Windows, macOS, and GNU/Linux operating systems. Minishift uses libmachine for provisioning virtual machines, and OKD for running the cluster.
+
+## What are **Operators**?
+
+From [Red Hat](https://www.redhat.com/en/blog/introducing-operator-framework-building-apps-kubernetes):
+> An Operator is a method of packaging, deploying and managing a Kubernetes application. A Kubernetes application is an application that is both deployed on Kubernetes and managed using the Kubernetes APIs and kubectl tooling. To be able to make the most of Kubernetes, you need a set of cohesive APIs to extend in order to service and manage your applications that run on Kubernetes. You can think of Operators as the runtime that manages this type of application on Kubernetes.
+
+## What are **Helm charts**?
+
+Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
 
 
 # Deploying a MicroProfile application in a Minishift cluster
 
-This lab will walk you through the deployment of our sample MicroProfile Application into a Minishift cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in ICP, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
+This lab will walk you through the deployment of our sample MicroProfile Application into a Minishift cluster, which is built on the open source Kubernetes framework. You'll build a MicroProfile application and package it inside a Open Liberty Docker container. You will then utilize a Helm chart that deploys the Liberty container in minishift, with the appropriate service setup, while also deploying and configuring a CouchDB Helm chart that stands up the database that holds the data for this microservice.
 
 ## Installing Minishift
 
 Follow [these instructions](https://docs.okd.io/latest/minishift/getting-started/installing.html) to install and setup minishift in your machine.
 
 After successfully installing Minishift, follow the [getting started](https://docs.okd.io/latest/minishift/getting-started/quickstart.html) instructions to get this cluster up and running!  In particular, pay attention to the step that sets up the `minishift oc-env`.  
+
+In addition, follow the instruction on [Setting Up the Virtualization Environment](https://docs.okd.io/latest/minishift/getting-started/setting-up-virtualization-environment.html) to set up the virtualization environment; and configure your docker environment by following the [Minishift Docker daemon](https://docs.okd.io/latest/minishift/using/docker-daemon.html).
 
 ## Part 1A: Build the application and Docker container
 
@@ -51,12 +63,12 @@ The vote microservice stores feedback from the sessions and displays how well al
 You can clone the lab artifacts and explore the application:
 
 1. Clone the project into your machine. This is already done on the laptop provided for you in this workshop, so you can skip this step. The cloned folder is under the Home directory (shortcut is on the desktop).
-    ```bash
-    git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
+    ```console
+    $ git clone https://github.com/microservices-api/kubernetes-microprofile-lab.git
     ```
 1. Navigate into the sample application directory:
-    ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts/application
+    ```console
+    $ cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. See if you can find where technologies described below are used in the application.
 
@@ -93,100 +105,186 @@ In this lab we demonstrate a best-practice pattern which separates the concerns 
 The following steps will build the sample application and create a Docker image that includes the vote microservice:
 
 1. Navigate into the sample application directory if you are not already:
-    ```bash
-    cd kubernetes-microprofile-lab/lab-artifacts/application
+    ```console
+    $ cd kubernetes-microprofile-lab/lab-artifacts/application
     ```
 1. Build the sample application:
-    ```bash
-    mvn clean package
+    ```console
+    $ mvn clean package
     ```
 1. Build and tag the Enterprise Docker image:
-    ```bash
-    cd ..
-    docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
+    ```console
+    $ cd ..
+    $ docker build -t microservice-enterprise-web:1.0.0  -f EnterpriseDockerfile .
     ```
 1. Build and tag the Application Docker image:
-    ```bash
-    docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
+    ```console
+    $ docker build -t microservice-vote:1.0.0  -f ApplicationDockerfile .
     ```
 1. You can use the Docker CLI to verify that your image is built:
-    ```bash
-    docker images
+    ```console
+    $ docker images
+    ```
+    If things have gone well, the output should look like this:
+    ```console
+    REPOSITORY                              TAG       IMAGE ID        CREATED         SIZE
+    microservice-vote                       1.0.0     8fe8ff1be07d    24 hours ago    369 MB
+    microservice-enterprise-web             1.0.0     61d03c45ca21    25 hours ago    350 MB
     ```
 
 ## Part 1B: Upload the Docker image to Minishift's registry
 
 We will use Minishift's internal Docker registry to host our image. 
 
-1. Ensure your `oc` client is logged into Minishift as `developer`.  To do this,  open the console and click on the top right corner to obtain the `oc login` command, which contains a token.  For example:
-```bash
-oc login https://192.198.78.10:8443 --token=k8WEA-ut2qBdpUN35mxYxNxkhmM6953GohIA7_7L1RE
-```
-
-** image goes here **
-
-1. Create a new project in Minishift which will host our application
-```bash
-oc new-project myproject
-```
+1. Ensure your `oc` client is logged into Minishift as `developer`. To do this, open the console and click on the top right corner to obtain the `oc login` command, which contains a token. For example:
+    ```console
+    $ oc login https://192.198.78.10:8443 --token=k8WEA-ut2qBdpUN35mxYxNxkhmM6953GohIA7_7L1RE
+    ```
 1. Log into the Docker registry
-```bash
-docker login -u developer -p $(oc whoami -t) $(minishift openshift registry)
-```
-1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the ICP Docker registry:
-    ```bash
-    docker push mycluster.icp:8500/<NAMESPACE>/microservice-vote:1.0.0
+    ```console
+    $ docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
     ```
-1. Your image is now available in the Docker registry in ICP. You can verify this through the management console: `Console -> Container Images`. Search for `microservice-vote`
+1. Tag your docker image to make it available to be used in `myproject`:
+    ```console
+    $ docker tag microservice-vote:1.0.0 $(minishift openshift registry)/myproject/microservice-vote:1.0.0
+    ```
+1. Now that you're logged in the registry, you can `docker push` your tagged image (`microservice-vote`) into the minishift Docker registry:
+    ```console
+    $ docker push $(minishift openshift registry)/myproject/microservice-vote:1.0.0
+    ```
 
-    ![Images Repository](images/images_repo.png)
+## Part 2: Deploy Open Liberty operator and CouchDB Helm chart
 
-## Part 2: Deploy Liberty and CouchDB Helm charts
+In this part of the lab you will install an operator and a Helm chart.
 
-You can use ICP Dashboard to deploy Helm charts into your Kubernetes cluster through the Catalog page. In addition, you can use Helm command line tool to install a Helm chart which we will do in this part of the lab.
+### Deploy CouchDB Helm
 
-First, let's see what are **Helm charts**. Helm is a package manager for Kubernetes (analogous to `yum` and `apt`). You can use it for managing Kubernetes charts (analogous to `debs` and `rpms`), which are packages of pre-configured Kubernetes resources. Instead of running a bunch of commands or maintaining multiple configuration files to create Kubernetes resources, Helm packages all the resources required to successfully run a service or multiple dependent services in one chart.
+In this section, we will deploy CouchDB Helm chart. However, as OKD does not come with tiller, we will install tiller on the cluster and set up Helm CLI to be able to communicate with the tiller.
 
-Now let's deploy our workload using Helm charts.
+1. Create a project for Tiller
+    ```console
+    $ oc new-project tiller
+    ```
+1. Download Helm CLI and install the Helm client locally:
 
-### Deploy CouchDB
+    Linux:
+    ```console
+    $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz | tar xz
+    $ cd linux-amd64
+    ```
+
+    OSX:
+    ```console
+    $ curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-darwin-amd64.tar.gz | tar xz
+    $ cd darwin-amd64
+    ```
+
+1. Now configure the Helm client locally. **Note:** _This will replace your current's Helm CLI. You can create a back up of your current Helm CLI and replace the lab's Helm CLI after you are done with the lab_:
+    ```console
+    $ sudo mv helm /usr/local/bin
+    $ sudo chmod a+x /usr/local/bin/helm
+    $ helm init --client-only
+    ```
+1. Install the Tiller server:
+    ```console
+    $ oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p TILLER_NAMESPACE="tiller" -p HELM_VERSION=v2.9.0 | oc create -f -
+    $ oc rollout status deployment tiller
+    ```
+    Rollout process might take a few minutes to complete. You can check the status of the deployment using `oc get deployment`.
+1. If things go well, the following commands should run successfully and you will see version of both the client and the server:
+    ```console
+    $ helm version --tiller-namespace=tiller
+    ```
+    Since we did not install Tiller in its default namespace (`kube-system`), we had to specify `--tiller-namespace=tiller`. Alternatively, you can run `export TILLER_NAMESPACE=tiller` instead of specifying `--tiller-namespace=tiller` in your Helm commands.
+
+Now that Helm is configured both locally and on OKD, you can deploy CouchDB Helm chart.
+1. Navigate to `kubernetes-microprofile-lab/lab-artifacts/helm/database`:
+    ```console
+    $ cd ~/kubernetes-microprofile-lab/lab-artifacts/helm/database
+    ```
+1. Switch project to `myproject`:
+    ```console
+    $ oc project myproject
+    ```
+1. Grant the Tiller server `edit` and `admin` access to the current project:
+    ```console
+    $ oc policy add-role-to-user edit "system:serviceaccount:tiller:tiller"
+    $ oc policy add-role-to-user admin "system:serviceaccount:tiller:tiller"
+    ```
+1. Switch to `admin` account instead of `developer` to avoid security access limitation for next step:
+    ```console
+    $ oc login -u system:admin
+    ```
+    If a password is required, the password is `admin`.
+1. Allow the default service account for the `myproject` namespace to run containers as any UID:
+    ```console
+    $ oc adm policy add-scc-to-user anyuid system:serviceaccount:myproject:default
+    ```
 1. Deploy the CouchDB Helm chart:
-    ```bash
-    cd helm/database
-    helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-    helm install incubator/couchdb -f db_values.yaml --name couchdb --tls
+    ```console
+    $ helm install couchdb-1.2.0.tgz -f db_values.yaml --name couchdb --tiller-namespace=tiller
     ```
-    Ensure the CouchDB pod is up and running by executing `kubectl get pods` command. Your output will look similar to the following:
-     ```bash
-    NAME                                        READY   STATUS    RESTARTS   AGE
-    couchdb-couchdb-0                           2/2     Running   0          3m
-    ```
-    
-    You need to wait until the value under `READY` column becomes `2/2`. Re-run the `kubectl get pods` command if necessary.
-
-### Deploy Liberty    
-1. Deploy the microservice using the Open Liberty Helm chart:
-    ```bash
-    cd ../application
-    helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-    helm install ibm-charts/ibm-open-liberty -f app_overrides.yaml -f enterprise_overrides.yaml --set image.repository=mycluster.icp:8500/<NAMESPACE>/microservice-vote --name vote-<NAMESPACE> --tls
+    Ensure the CouchDB pod is up and running by executing `oc get pods` command. It might take a few minutes and the CouchDB pod might restart a few times but eventually the output should look similar to the following:
+     ```console
+    NAME                            READY   STATUS    RESTARTS   AGE
+    couchdb-couchdb-0               2/2     Running   0          3m
     ```
 
-1. Let's check on our deployment in the ICP dashboard. From the management console, go into `Workloads -> Deployments`.
-1. Click on the Namespace menu on the top right of the page.
-1. Select the namespace that belongs to you.
-1. You should see a deployment `vote-<NAMESPACE>-ibm-open`.
-1. Similarly, you will see `couchdb-couchdb` when you go into `Workloads -> Statefulsets` under your namespace.
-1. Feel free to click on any of the deployments and see details about each deployments.
-1. Now lets see what Kubernetes resources this Helm chart created in addition to Deployment resources. From the management console, go into `Workloads -> Helm Releases`.
-1. Click on your Helm release name. You can use the search box to find it by entering `vote-<NAMESPACE>`
-1. Release page shows all the Kubernetes resources created on the cluster.
-1. See that there are four resources created under **Service**.
-1. Click on `vote-<NAMESPACE>-ibm-open`. This would take you to another page.
-1. You should see a link for **Node port** `https`. Click on the link. Note that if you go to the `https` link, your browser might complain about the connection being not secure. You can ignore this error. On FireFox, click on `Advanced -> Add Exception... -> Confirm Security Exception`
-1. You should see the Liberty Welcome Page.
-1. Add `/openapi/ui` to the end of URL to reach the OpenAPI User Interface. For example, `https://<IP>:<PORT>/openapi/ui`.
-1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into a Kubernetes cluster!
+    You need to wait until the value under `READY` column becomes `2/2`. Re-run the `oc get pods` command if necessary.
+
+### Deploy Open Liberty Operators
+
+Before we deploy an Open Liberty Operator, watch these two videos to get familiar with Operators
+* [Red Hat OpenShift: Operators Framework](https://youtu.be/LymzLHRbQdk)
+* [Keynote: Maturing Kubernetes Operators](https://youtu.be/kld1Fi8RrRQ)
+
+If you need more information about Operators, here is a good source to start: [Operators on Red Hat OpenShift](https://www.openshift.com/learn/topics/operators).
+
+#### Install Open Liberty artifacts
+
+1. Navigate to Open Liberty Operator artifact directory:
+    ```console
+    $ cd ../../operator/open-liberty-operator
+    ```
+1. Install Open Liberty Operator Lifecycle Manager (OLM):
+    ```console
+    $ oc apply -f olm/open-liberty-crd.yaml
+    ```
+1. Open Liberty Operator requires the following Kubernetes resources to be installed: ServiceAccount, Role and RoleBinding resources. Run the following commands to deploy them:
+    ```console
+    $ oc apply -f deploy/service_account.yaml
+    $ oc apply -f deploy/role.yaml
+    $ oc apply -f deploy/role_binding.yaml
+    ```
+1. Now create an instance of the Open Liberty operator:
+    ```console
+    $ oc apply -f deploy/operator.yaml
+    ```
+
+    You would need to wait for the Open Liberty Operator installation to be completed. You can check the status using `oc get pods` and wait until the `open-liberty-operator` pod is ready.
+
+#### Deploy application
+
+1. Change the `application-cr.yaml` file inside of the `lab-artifacts/operator/application` folder to pull image from the minishift docker registry. To begin with, get the ip of the registry by running the following command:
+    ```console
+    $ minishift openshift registry
+    ```
+    Copy and paste the output as part of the value of `repository`, for example:
+    ```console
+    repository: 172.30.1.1:5000/myproject/microservice-vote
+    ```
+1. Deploy the microservice application using the provided CR:
+    ```console
+    $ cd ../application
+    $ oc apply -f application-cr.yaml
+    ```
+1. You can view the status of your deployment by running `oc get deployments`.  If the deployment is not coming up after a few minutes one way to debug what happened is to query the pods with `oc get pods` and then fetch the logs of the Liberty pod with `oc logs <pod>`.
+1. We will access the application using NodePort service. Run the following command to get the service port:
+    ```console
+    $ minishift openshift service operator-lab-openliberty
+    ```
+    Now, from your browser, go to `https://<NODEPORT>/openapi/ui/`. If those invocations are still taking long, please wait a few minutes for the deployment to fully initiate.
+1. Congratulations! You have successfully deployed a [MicroProfile](http://microprofile.io/) container into an OKD cluster using operators!
 
 ## Part 3: Explore the application
 
@@ -194,70 +292,11 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 
 1. Expand the `POST /attendee` endpoint and click the `Try it out` button.
 1. Place your username (e.g. userX) in the `id` field, and place your name in the `name` field.
-    ![image](images/post_screenshot.png)
+    ![image](../../images/post_screenshot.png)
 1. Click on the `Execute` button.  Scroll down and you'll see the `curl` command that was used, the `Requested URL` and then details of the response.  This entry has now been saved into the CouchDB database that our microservice is using.
-    ![image](images/post_result.png)
+    ![image](../../images/post_result.png)
 1. Now expand the `GET /attendee/{id}`, click the `Try it out` button, and type into the textbox the `id` you entered from the previous step.
 1. Click on `Execute` and inspect that the `Respond body` contains the same name that you created in step 2. You successfully triggered a fetch from our microservice into the CouchDB database.
 1. Feel free to explore the other APIs and play around with the microservice!
 
-## Part 4: Update the Helm release
-
-In this part of the lab you will practice how to make changes to the Helm release you just deployed on the cluster using the Helm CLI.
-
-So far, the database you deployed stores the data inside the container running the database. This means if the container gets deleted or restarted for any reason, all the data stored in the database would be lost.
-
-In order to store the data outside of the database container, you would need to enable data persistence through the Helm chart. When you enable persistence, the database would store the data in a PersistentVolume. A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or by an automatic provisioner.
-
-The steps below would guide you how to enable persistence for your database:
-
-1. In [Part 3](#Part-3-Explore-the-application), you would've observed that calling `GET /attendee/{id}` returns the `name` you specified. Calling `GET` would read the data from the database.
-1. Find the name of the pod that is running the database container:
-    ```bash
-    kubectl get pods
-    ```
-    You should see a pod name similar to `couchdb-couchdb-0`.
-1. Delete the CouchDB pod to delete the container running the database.
-    ```bash
-    kubectl delete pod couchdb-couchdb-0
-    ```
-1. Run the following command to see the state of deployments:
-    ```bash
-    kubectl get pods
-    ```
-    You should get an output similar to the following:
-    ```bash
-    NAME                                        READY   STATUS    RESTARTS   AGE
-    couchdb-couchdb-0                           2/2     Running   0          3m
-    vote-userx-ibm-open-5b44d988bd-kqrjn   1/1     Running   0          3m
-    ```
-    Again, you need to wait until the couchdb pod is ready. Wait until the value under `READY` column becomes `2/2`. 
-
-1. Call again the `GET /attendee/{id}` endpoint from the OpenAPI UI page and see that the server does not return the attendee you created anymore. Instead, it returns 404. That's because the data was stored in the couchdb pod and was lost when the pod was deleted. Let's upgrade our release to add persistence.
-1. Now let's enable persistence for our database:
-    ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set persistentVolume.enabled=true couchdb incubator/couchdb
-    ```
-1. Let's also upgrade the Liberty release for high availability by increasing the number of replicas:
-    ```bash
-    helm upgrade --tls --recreate-pods --force --reuse-values --set replicaCount=2 vote-<NAMESPACE> ibm-charts/ibm-open-liberty
-    ```
-1. List the deployed packages with their chart versions by running:
-    ```bash
-    helm ls --namespace <NAMESPACE> --tls
-    ```
-    You can see that the number of revision should be 2 now for couchdb and Liberty.
-1. Run the following command to see the state of deployments:
-    ```bash
-    kubectl get pods
-    ```
-    You need to wait until the couchdb and Liberty pods become ready. The old pods may be terminating while the new ones start up.
-
-    For Liberty, you will now see 2 pods, since we increased the number of replicas.
-1. Refresh the page. You may need to add the security exception again. If you get `Failed to load API defintion` message then try refreshing again. 
-1. Now add a new attendee through the OpenAPI UI as before.
-1. Now repeat Steps 1-5 in this section to see that even though you delete the couchdb database container, data still gets recovered from the PersistentVolume.
-
-In this part you were introduced to rolling updates. DevOps teams can perform zero-downtime application upgrades, which is an important consideration for production environments.
-
-Congratulations! You finished the lab! You got to use a few powerful tools to interact with Kubernetes to deploy a microservice into IBM Cloud Private. Although this lab is finished but the journey to Kubernetes should not end here! Head to the [Learn more](#learn-more) section to see other great resources.
+Congratulations! You finished the lab! You got to use a few powerful tools to deploy a microservice into minishift. Although this lab is finished but the journey to minishift/openshift should not end here!
