@@ -136,6 +136,11 @@ The following steps will build the sample application and create a Docker image 
 
 We will use Minishift's internal Docker registry to host our image. 
 
+1. Configure your environment for Minishift:
+    ```console
+    $ eval $(minishift oc-env)
+    $ eval $(minishift docker-env)
+    ```
 1. Ensure your `oc` client is logged into Minishift as `developer`. To do this, open the console and click on the top right corner to obtain the `oc login` command, which contains a token. For example:
     ```console
     $ oc login https://192.198.78.10:8443 --token=k8WEA-ut2qBdpUN35mxYxNxkhmM6953GohIA7_7L1RE
@@ -300,3 +305,23 @@ The `vote` application is using various MicroProfile specifications.  The `/open
 1. Feel free to explore the other APIs and play around with the microservice!
 
 Congratulations! You finished the lab! You got to use a few powerful tools to deploy a microservice into minishift. Although this lab is finished but the journey to minishift/openshift should not end here!
+
+## Troubleshooting
+Here are a few common issues that people run into. If you experience a problem that is not documented, feel free to open an issue so that it can be documented.
+
+### oc: command not found
+You need to configure your environment for Minishift. Run the following command
+```console
+$ eval $(minishift oc-env)
+```
+
+### I am not able to log in to the Docker registry.
+If you are not able to login to the Docker registry and an error similar to the following:
+```
+Error response from daemon: Get https://172.30.1.1:5000/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+```
+
+You will need to configure your Docker client for Minishift. Run the following command:
+```console
+$ eval $(minishift docker-env)
+```
