@@ -1,5 +1,5 @@
 
-![Overview](images/diagram_general.png)
+![Overview](images/overview.png)
 
 # MicroProfile Lab with Open Liberty and OKD
 
